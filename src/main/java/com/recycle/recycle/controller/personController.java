@@ -45,24 +45,23 @@ public class personController {
         }
     }
 
-//    @PutMapping("/{id}")
-//    public ResponseEntity<?> updatePerson(@PathVariable String id, @RequestBody PersonDTO updatedData) {
-//        try {
-//            Optional<Person> person = personService.updatePerson(id, updatedData);
-//            if (person.isPresent()) {
-//                return new ResponseEntity<>(person.get(), HttpStatus.OK);
-//            } else {
-//                return new ResponseEntity<>(exception., HttpStatus.NOT_FOUND);
-//            }
-//        }
-//
-//        @DeleteMapping("/{id}")
-//        public ResponseEntity<?> deletePerson (@PathVariable String id){
-//            Optional<Person> person = personService.deletePerson(id);
-//            if (person.isPresent()) {
-//                return new ResponseEntity<>("Person deleted successfully", HttpStatus.OK);
-//            } else {
-//                return new ResponseEntity<>("Person Not Found", HttpStatus.NOT_FOUND);
-//            }
-//        }
+    @PutMapping("/{id}")
+    public ResponseEntity<?> updatePerson(@PathVariable String id, @RequestBody PersonDTO updatedData) {
+        try {
+            Person updatedperson = personService.updatePerson(id, updatedData);
+            return new ResponseEntity<>(updatedperson, HttpStatus.OK);
+        } catch (EntityNotFoundExceptions exception) {
+            return new ResponseEntity<>(exception.getMessage(), HttpStatus.NOT_FOUND);
+        }
     }
+
+        @DeleteMapping("/{id}")
+        public ResponseEntity<?> deletePerson (@PathVariable String id){
+            try {
+                personService.deletePerson(id);
+                return new ResponseEntity<>("Person deleted successfully!", HttpStatus.OK);
+            } catch (EntityNotFoundExceptions exception) {
+                return new ResponseEntity<>(exception.getMessage(), HttpStatus.NOT_FOUND);
+            }
+        }
+}

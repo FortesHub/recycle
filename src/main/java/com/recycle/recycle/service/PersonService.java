@@ -27,37 +27,30 @@ public class PersonService {
     }
 
     public Person findPersonById(String id) {
-      return  personRepository.findPersonById(id)
-              .orElseThrow(() -> new EntityNotFoundExceptions("Person id Not Found"));
-        }
-
-
-    public Optional<Person> updatePerson(String id, PersonDTO updatedData) {
-        Optional<Person> person = personRepository.findPersonById(id);
-        if (person.isPresent()) {
-            Person updatePerson = person.get();
-            updatePerson.setName(updatedData.name());
-            updatePerson.setTelephone(updatedData.telephone());
-            updatePerson.setEmail(updatedData.email());
-            updatePerson.setAddress(updatedData.address());
-            personRepository.save(updatePerson);
-            return Optional.of(updatePerson);
-        } else {
-            return Optional.empty();
-        }
+        return getPersonIfExist(id);
     }
 
-    public Optional<Person> deletePerson(String id) {
-        Optional<Person> person = personRepository.findPersonById(id);
-        if (person.isPresent()) {
-            personRepository.deleteById(id);
-        } else {
-            Optional.empty();
-        }
-        return person;
+
+    public Person updatePerson(String id, PersonDTO updatedData) {
+        Person person = getPersonIfExist(id);
+        person.setName(updatedData.name());
+        person.setTelephone(updatedData.telephone());
+        person.setEmail(updatedData.email());
+        person.setAddress(updatedData.address());
+        return personRepository.save(person);
+    }
+
+    public void deletePerson(String id) {
+        Person person = getPersonIfExist(id);
+        personRepository.deleteById(id);
     }
 
     public void savePerson(Person person) {
         this.personRepository.save(person);
+    }
+
+    private Person getPersonIfExist(String id) {
+        return personRepository.findPersonById(id)
+                .orElseThrow(() -> new EntityNotFoundExceptions("Person Not Found"));
     }
 }
