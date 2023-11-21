@@ -1,14 +1,17 @@
 package com.recycle.recycle.service;
 
 import com.recycle.recycle.domain.Person;
-import com.recycle.recycle.dto.PersonDTO;
-import com.recycle.recycle.infra.EntityNotFoundExceptions;
+import com.recycle.recycle.dto.AddressDTO;
+import com.recycle.recycle.dto.RegisterPersonDTO;
+import com.recycle.recycle.mapper.PersonMapper;
 import com.recycle.recycle.repository.PersonRepository;
+
+import io.micrometer.common.util.StringUtils;
+import jakarta.persistence.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Optional;
 
 
 @Service
@@ -16,10 +19,13 @@ public class PersonService {
     @Autowired
     PersonRepository personRepository;
 
-    public Person registerPerson(PersonDTO data) {
-        Person newPerson = new Person(data);
+    @Autowired
+    PersonMapper personMapper;
+
+    public RegisterPersonDTO registerPerson(RegisterPersonDTO data) {
+        Person newPerson = personMapper.personDTOToPerson(data);
         this.savePerson(newPerson);
-        return newPerson;
+        return personMapper.personToPersonDTO(newPerson);
     }
 
     public List<Person> getAllPerson() {
@@ -30,27 +36,28 @@ public class PersonService {
         return getPersonIfExist(id);
     }
 
-
-    public Person updatePerson(String id, PersonDTO updatedData) {
+    public RegisterPersonDTO updatePerson(String id, RegisterPersonDTO updatedData) {
         Person person = getPersonIfExist(id);
-        person.setName(updatedData.name());
-        person.setTelephone(updatedData.telephone());
-        person.setEmail(updatedData.email());
-        person.setAddress(updatedData.address());
-        return personRepository.save(person);
+        personMapper.updatePersonFromDTO(updatedData, person);
+        personRepository.save(person);
+        return personMapper.personToPersonDTO(person);
     }
 
     public void deletePerson(String id) {
-        Person person = getPersonIfExist(id);
+        getPersonIfExist(id);
         personRepository.deleteById(id);
     }
 
-    public void savePerson(Person person) {
+    public Person savePerson(Person person) {
         this.personRepository.save(person);
+        return person;
     }
 
     private Person getPersonIfExist(String id) {
-        return personRepository.findPersonById(id)
-                .orElseThrow(() -> new EntityNotFoundExceptions("Person Not Found"));
+        return personRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Person Not Found"));
     }
+
 }
+
+

@@ -1,21 +1,18 @@
 package com.recycle.recycle.controller;
 
 import com.recycle.recycle.domain.Person;
-import com.recycle.recycle.dto.PersonDTO;
-import com.recycle.recycle.infra.EntityNotFoundExceptions;
+import com.recycle.recycle.dto.RegisterPersonDTO;
 import com.recycle.recycle.service.PersonService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
-import java.nio.channels.ScatteringByteChannel;
 import java.util.List;
-import java.util.Optional;
 
+@Validated
 @RestController()
 @RequestMapping("/person")
 public class personController {
@@ -24,8 +21,8 @@ public class personController {
     PersonService personService;
 
     @PostMapping
-    public ResponseEntity<Person> registerPerson(@RequestBody @Valid PersonDTO data) {
-        Person newPerson = personService.registerPerson(data);
+    public ResponseEntity<RegisterPersonDTO> registerPerson(@Valid @RequestBody RegisterPersonDTO data) {
+        RegisterPersonDTO newPerson = personService.registerPerson(data);
         return new ResponseEntity<>(newPerson, HttpStatus.CREATED);
     }
 
@@ -37,31 +34,19 @@ public class personController {
 
     @GetMapping("/{id}")
     public ResponseEntity<?> getPersonById(@PathVariable("id") String id) {
-        try {
-            Person person = personService.findPersonById(id);
-            return new ResponseEntity<>(person, HttpStatus.OK);
-        } catch (EntityNotFoundExceptions exception) {
-            return new ResponseEntity<>(exception.getMessage(), HttpStatus.NOT_FOUND);
-        }
+        Person person = personService.findPersonById(id);
+        return new ResponseEntity<>(person, HttpStatus.OK);
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<?> updatePerson(@PathVariable String id, @RequestBody PersonDTO updatedData) {
-        try {
-            Person updatedperson = personService.updatePerson(id, updatedData);
-            return new ResponseEntity<>(updatedperson, HttpStatus.OK);
-        } catch (EntityNotFoundExceptions exception) {
-            return new ResponseEntity<>(exception.getMessage(), HttpStatus.NOT_FOUND);
-        }
+    public ResponseEntity<RegisterPersonDTO> updatePerson(@PathVariable String id, @RequestBody @Valid RegisterPersonDTO updatedData) {
+        RegisterPersonDTO updatedperson = personService.updatePerson(id, updatedData);
+        return new ResponseEntity<>(updatedperson, HttpStatus.OK);
     }
 
-        @DeleteMapping("/{id}")
-        public ResponseEntity<?> deletePerson (@PathVariable String id){
-            try {
-                personService.deletePerson(id);
-                return new ResponseEntity<>("Person deleted successfully!", HttpStatus.OK);
-            } catch (EntityNotFoundExceptions exception) {
-                return new ResponseEntity<>(exception.getMessage(), HttpStatus.NOT_FOUND);
-            }
-        }
+    @DeleteMapping("/{id}")
+    public ResponseEntity<?> deletePerson(@PathVariable String id) {
+        personService.deletePerson(id);
+        return new ResponseEntity<>("Person deleted successfully!", HttpStatus.OK);
+    }
 }
