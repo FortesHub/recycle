@@ -1,16 +1,19 @@
 package com.recycle.recycle.domain;
 
-import com.recycle.recycle.dto.PersonDTO;
 import jakarta.persistence.*;
+
+import jakarta.validation.constraints.NotBlank;
 import lombok.*;
 
-@Table(name="person")
-@Entity(name="person")
-@Getter
-@Setter
-@AllArgsConstructor
+
+import javax.validation.Valid;
+import javax.validation.constraints.NotNull;
+
+@Table(name = "person")
+@Entity(name = "person")
+@Data
 @NoArgsConstructor
-@EqualsAndHashCode(of="id")
+@EqualsAndHashCode(of = "id")
 public class Person {
 
     @Id
@@ -21,14 +24,8 @@ public class Person {
     @Column(unique = true)
     private String email;
     @ManyToOne(cascade = CascadeType.ALL)
-    @JoinColumn(name="address_id")
+    @JoinColumn(name = "address_id")
+    @Valid
     private Address address;
-
-    public Person(PersonDTO data) {
-        this.name = data.name();
-        this.telephone = data.telephone();
-        this.email = data.email();
-        this.address = data.address();
-    }
 
 }

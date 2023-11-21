@@ -1,7 +1,11 @@
 package com.recycle.recycle.domain;
 
 import jakarta.persistence.*;
+
 import lombok.*;
+
+import javax.validation.constraints.NotNull;
+
 
 @Table(name = "address")
 @Entity(name = "address")
