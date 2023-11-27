@@ -9,8 +9,7 @@ import javax.validation.constraints.NotNull;
 
 @Table(name = "address")
 @Entity(name = "address")
-@Getter
-@Setter
+@Data
 @AllArgsConstructor
 @NoArgsConstructor
 @EqualsAndHashCode(of = "id")

@@ -12,6 +12,7 @@ import javax.validation.constraints.NotNull;
 @Table(name = "person")
 @Entity(name = "person")
 @Data
+@AllArgsConstructor
 @NoArgsConstructor
 @EqualsAndHashCode(of = "id")
 public class Person {

@@ -1,12 +1,10 @@
 package com.recycle.recycle.service;
 
 import com.recycle.recycle.domain.Person;
-import com.recycle.recycle.dto.AddressDTO;
 import com.recycle.recycle.dto.RegisterPersonDTO;
 import com.recycle.recycle.mapper.PersonMapper;
 import com.recycle.recycle.repository.PersonRepository;
 
-import io.micrometer.common.util.StringUtils;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -23,9 +21,9 @@ public class PersonService {
     PersonMapper personMapper;
 
     public RegisterPersonDTO registerPerson(RegisterPersonDTO data) {
-        Person newPerson = personMapper.personDTOToPerson(data);
-        this.savePerson(newPerson);
-        return personMapper.personToPersonDTO(newPerson);
+        Person newPerson = personMapper.convertToPerson(data);
+        Person savedPerson = this.personRepository.save(newPerson);
+        return personMapper.convertToDTO(savedPerson);
     }
 
     public List<Person> getAllPerson() {
@@ -36,11 +34,12 @@ public class PersonService {
         return getPersonIfExist(id);
     }
 
-    public RegisterPersonDTO updatePerson(String id, RegisterPersonDTO updatedData) {
-        Person person = getPersonIfExist(id);
-        personMapper.updatePersonFromDTO(updatedData, person);
-        personRepository.save(person);
-        return personMapper.personToPersonDTO(person);
+    public RegisterPersonDTO updatePerson(String id, RegisterPersonDTO data) {
+        Person existingPerson = getPersonIfExist(id);
+        existingPerson = personMapper.updateDTOToPerson(data, existingPerson);
+        Person updatedPerson = this.personRepository.save(existingPerson);
+        RegisterPersonDTO resultPerson = personMapper.convertToDTO(updatedPerson);
+        return resultPerson;
     }
 
     public void deletePerson(String id) {
@@ -48,16 +47,10 @@ public class PersonService {
         personRepository.deleteById(id);
     }
 
-    public Person savePerson(Person person) {
-        this.personRepository.save(person);
-        return person;
-    }
-
     private Person getPersonIfExist(String id) {
         return personRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Person Not Found"));
     }
-
 }
 
 
