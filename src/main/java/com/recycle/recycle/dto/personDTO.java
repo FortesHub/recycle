@@ -7,7 +7,8 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.groups.ConvertGroup;
 
-public record RegisterPersonDTO(@NotBlank(message = "Empty name")
+public record personDTO(
+        @NotBlank(message = "Empty name")
                                 String name, @NotBlank(message = "Empty telephone")
                                 String telephone, @NotBlank(message = "Empty email")
                                 String email, @Valid
@@ -16,6 +17,4 @@ public record RegisterPersonDTO(@NotBlank(message = "Empty name")
                                         @ConvertGroup(from = Person.class, to = Address.class)
                                 })
                                 AddressDTO address) {
-
-
 }

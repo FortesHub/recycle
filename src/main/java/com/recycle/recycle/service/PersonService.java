@@ -1,7 +1,7 @@
 package com.recycle.recycle.service;
 
 import com.recycle.recycle.domain.Person;
-import com.recycle.recycle.dto.RegisterPersonDTO;
+import com.recycle.recycle.dto.personDTO;
 import com.recycle.recycle.mapper.PersonMapper;
 import com.recycle.recycle.repository.PersonRepository;
 
@@ -20,7 +20,7 @@ public class PersonService {
     @Autowired
     PersonMapper personMapper;
 
-    public RegisterPersonDTO registerPerson(RegisterPersonDTO data) {
+    public personDTO registerPerson(personDTO data) {
         Person newPerson = personMapper.convertToPerson(data);
         Person savedPerson = this.personRepository.save(newPerson);
         return personMapper.convertToDTO(savedPerson);
@@ -34,11 +34,11 @@ public class PersonService {
         return getPersonIfExist(id);
     }
 
-    public RegisterPersonDTO updatePerson(String id, RegisterPersonDTO data) {
+    public personDTO updatePerson(String id, personDTO data) {
         Person existingPerson = getPersonIfExist(id);
         existingPerson = personMapper.updateDTOToPerson(data, existingPerson);
         Person updatedPerson = this.personRepository.save(existingPerson);
-        RegisterPersonDTO resultPerson = personMapper.convertToDTO(updatedPerson);
+        personDTO resultPerson = personMapper.convertToDTO(updatedPerson);
         return resultPerson;
     }
 

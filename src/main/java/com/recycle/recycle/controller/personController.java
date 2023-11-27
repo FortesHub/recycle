@@ -1,7 +1,7 @@
 package com.recycle.recycle.controller;
 
 import com.recycle.recycle.domain.Person;
-import com.recycle.recycle.dto.RegisterPersonDTO;
+import com.recycle.recycle.dto.personDTO;
 import com.recycle.recycle.service.PersonService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -21,8 +21,8 @@ public class personController {
     PersonService personService;
 
     @PostMapping
-    public ResponseEntity<RegisterPersonDTO> registerPerson(@Valid @RequestBody RegisterPersonDTO data) {
-        RegisterPersonDTO newPerson = personService.registerPerson(data);
+    public ResponseEntity<personDTO> registerPerson(@Valid @RequestBody personDTO data) {
+        personDTO newPerson = personService.registerPerson(data);
         return new ResponseEntity<>(newPerson, HttpStatus.CREATED);
     }
 
@@ -39,8 +39,8 @@ public class personController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<RegisterPersonDTO> updatePerson(@PathVariable String id, @RequestBody @Valid RegisterPersonDTO updatedData) {
-        RegisterPersonDTO updatedperson = personService.updatePerson(id, updatedData);
+    public ResponseEntity<personDTO> updatePerson(@PathVariable String id, @RequestBody @Valid personDTO updatedData) {
+        personDTO updatedperson = personService.updatePerson(id, updatedData);
         return new ResponseEntity<>(updatedperson, HttpStatus.OK);
     }
 

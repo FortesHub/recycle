@@ -3,7 +3,7 @@ package com.recycle.recycle.service;
 import com.recycle.recycle.domain.Address;
 import com.recycle.recycle.domain.Person;
 import com.recycle.recycle.dto.AddressDTO;
-import com.recycle.recycle.dto.RegisterPersonDTO;
+import com.recycle.recycle.dto.personDTO;
 import com.recycle.recycle.mapper.PersonMapper;
 import com.recycle.recycle.repository.PersonRepository;
 import jakarta.persistence.EntityNotFoundException;
@@ -15,7 +15,6 @@ import org.mapstruct.factory.Mappers;
 import org.mockito.*;
 
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.boot.test.mock.mockito.MockBean;
 
 import java.util.Arrays;
 import java.util.List;
@@ -36,7 +35,7 @@ class PersonServiceTest {
     @Spy
     private PersonMapper personMapper = Mappers.getMapper(PersonMapper.class);
 
-    private RegisterPersonDTO mockedDTO;
+    private personDTO mockedDTO;
     private List<Person> mockedPersonList;
     private List<Address> mockedAddressList;
 
@@ -45,7 +44,7 @@ class PersonServiceTest {
     public void setUp() {
         MockitoAnnotations.initMocks(this);
 
-        mockedDTO = new RegisterPersonDTO(
+        mockedDTO = new personDTO(
                 "John",
                 "438-111-1111",
                 "john@john.ca",
@@ -73,7 +72,7 @@ class PersonServiceTest {
         when(personMapper.convertToDTO(mockedPersonList.get(0))).thenReturn(mockedDTO);
         when(personRepository.save(any(Person.class))).thenReturn(mockedPersonList.get(0));
 
-        RegisterPersonDTO resultDTO = personService.registerPerson(mockedDTO);
+        personDTO resultDTO = personService.registerPerson(mockedDTO);
 
         verify(personRepository, times(1)).save(any(Person.class));
         assertEquals(mockedDTO, resultDTO);
@@ -112,12 +111,12 @@ class PersonServiceTest {
     @Test
     void givenIdPersonAndUpdatePerson() {
         String id = "321";
-        RegisterPersonDTO updatedPerson = new RegisterPersonDTO("updatedJohn", "438-111-1111", "updatedjohn@gmail.com", new AddressDTO("rue des johns",
+        personDTO updatedPerson = new personDTO("updatedJohn", "438-111-1111", "updatedjohn@gmail.com", new AddressDTO("rue des johns",
                 "3", "j4k4j4", "Saint Jean Sur Richelieu", "Canada"));
 
         when(personRepository.findById(id)).thenReturn(Optional.of(mockedPersonList.get(0)));
         when(personRepository.save(Mockito.any())).thenReturn(mockedPersonList.get(0));
-        RegisterPersonDTO resultDTO = personService.updatePerson(id, updatedPerson);
+        personDTO resultDTO = personService.updatePerson(id, updatedPerson);
 
         verify(personRepository, times(1)).findById(id);
         verify(personRepository, times(1)).save(any(Person.class));
