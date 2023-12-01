@@ -3,7 +3,7 @@ package com.recycle.recycle.service;
 import com.recycle.recycle.domain.Address;
 import com.recycle.recycle.domain.Person;
 import com.recycle.recycle.dto.AddressDTO;
-import com.recycle.recycle.dto.personDTO;
+import com.recycle.recycle.dto.PersonDTO;
 import com.recycle.recycle.mapper.PersonMapper;
 import com.recycle.recycle.repository.PersonRepository;
 import jakarta.persistence.EntityNotFoundException;
@@ -20,8 +20,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
@@ -35,16 +34,15 @@ class PersonServiceTest {
     @Spy
     private PersonMapper personMapper = Mappers.getMapper(PersonMapper.class);
 
-    private personDTO mockedDTO;
-    private List<Person> mockedPersonList;
-    private List<Address> mockedAddressList;
-
+    private PersonDTO personDTO;
+    private List<Person> personList;
+    private List<Address> addressList;
 
     @BeforeEach
     public void setUp() {
         MockitoAnnotations.initMocks(this);
 
-        mockedDTO = new personDTO(
+        personDTO = new PersonDTO(
                 "John",
                 "438-111-1111",
                 "john@john.ca",
@@ -55,71 +53,63 @@ class PersonServiceTest {
                         "Canada")
         );
 
-        mockedAddressList = Arrays.asList(
+        addressList = Arrays.asList(
                 new Address(321L, "rue des johns", "3", "j4k4j4", "Saint Jean Sur Richelieu", "Canada"),
                 new Address(789L, "rue des Brin", "4", "j4k4j4", "Saint Jean Sur Richelieu", "Canada")
         );
-        mockedPersonList = Arrays.asList(
-                new Person("321", "John", "438-111-1111", "john@john.ca", mockedAddressList.get(0)),
-                new Person("789", "bron", "438-111-1111", "bron@bron.ca", mockedAddressList.get(1))
+
+        personList = Arrays.asList(
+                new Person("321", "John", "438-111-1111", "john@john.ca", addressList.get(0)),
+                new Person("789", "bron", "438-111-1111", "bron@bron.ca", addressList.get(1))
         );
     }
 
-    @DisplayName("Test for registerPerson and return personObject")
+    @DisplayName("Test for register person and return Person")
     @Test
-    void givenPersonObject_whenRegister_returnPersonObject() {
-        when(personMapper.convertToPerson(mockedDTO)).thenReturn(mockedPersonList.get(0));
-        when(personMapper.convertToDTO(mockedPersonList.get(0))).thenReturn(mockedDTO);
-        when(personRepository.save(any(Person.class))).thenReturn(mockedPersonList.get(0));
-
-        personDTO resultDTO = personService.registerPerson(mockedDTO);
+    void givenPersonObject_whenRegisterPerson() {
+        when(personRepository.save(any(Person.class))).thenReturn(personList.get(0));
+        PersonDTO resultDTO = personService.registerPerson(personDTO);
 
         verify(personRepository, times(1)).save(any(Person.class));
-        assertEquals(mockedDTO, resultDTO);
+        verify(personMapper, times(1)).convertToPerson(personDTO);
+        verify(personMapper, times(1)).convertToDTO(personList.get(0));
+        assertEquals(personDTO, resultDTO);
     }
 
-    @DisplayName("Test for get all person and return all person")
+    @DisplayName("Test for get all person and return list of person")
     @Test
-    void getAllPerson() {
-        when(personRepository.findAll()).thenReturn(mockedPersonList);
+    void givenPersonList_whenGetAllPerson() {
+        when(personRepository.findAll()).thenReturn(personList);
         List<Person> resultList = personService.getAllPerson();
-        assertEquals(mockedPersonList.size(), resultList.size());
+        assertEquals(personList.size(), resultList.size());
         verify(personRepository, times(1)).findAll();
     }
 
-    @DisplayName("Test for find person By Id and return The Person")
+    @DisplayName("Test for find person By Id and return Person")
     @Test
-    void givenIdPersonAndReturnThePerson() {
+    void givenOptionalPerson_whenGetPersonById() {
         String personId = "321";
-        when(personRepository.findById(personId)).thenReturn(Optional.of(mockedPersonList.get(0)));
-        Person resultPerson = personService.findPersonById(personId);
+        when(personRepository.findById(personId)).thenReturn(Optional.of(personList.get(0)));
+        Optional<Person> resultPerson = personService.getPersonById(personId);
         verify(personRepository, times(1)).findById(personId);
-        assertEquals(mockedPersonList.get(0), resultPerson);
-    }
-
-    @DisplayName("Test for find person By Id and return Person Not Find")
-    @Test
-    void givenIdPersonAndReturnPersonNotFind() {
-        String personId = "321";
-        when(personRepository.findById(personId)).thenReturn(Optional.empty());
-        assertThrows(EntityNotFoundException.class, () -> {
-            personService.findPersonById(personId);
-        });
+        assertEquals(Optional.of(personList.get(0)), resultPerson);
     }
 
     @DisplayName("Test for update Person with existing Id")
     @Test
     void givenIdPersonAndUpdatePerson() {
         String id = "321";
-        personDTO updatedPerson = new personDTO("updatedJohn", "438-111-1111", "updatedjohn@gmail.com", new AddressDTO("rue des johns",
+        PersonDTO updatedPersonDTO = new PersonDTO("updatedJohn", "438-111-1111", "updatedjohn@gmail.com", new AddressDTO("rue des johns",
                 "3", "j4k4j4", "Saint Jean Sur Richelieu", "Canada"));
 
-        when(personRepository.findById(id)).thenReturn(Optional.of(mockedPersonList.get(0)));
-        when(personRepository.save(Mockito.any())).thenReturn(mockedPersonList.get(0));
-        personDTO resultDTO = personService.updatePerson(id, updatedPerson);
+        when(personRepository.findById(id)).thenReturn(Optional.of(personList.get(0)));
+        when(personRepository.save(any())).thenReturn(personList.get(0));
+        PersonDTO resultDTO = personService.updatePerson(id, updatedPersonDTO);
 
         verify(personRepository, times(1)).findById(id);
         verify(personRepository, times(1)).save(any(Person.class));
+        verify(personMapper, times(1)).updateDTOToPerson(updatedPersonDTO, personList.get(0));
+        verify(personMapper, times(1)).convertToDTO(personList.get(0));
 
         assertEquals("updatedJohn", resultDTO.name());
         assertEquals("438-111-1111", resultDTO.telephone());
@@ -131,24 +121,14 @@ class PersonServiceTest {
         assertEquals("Canada", resultDTO.address().pays());
     }
 
-    @DisplayName("Test for find person By Id and delete this Person")
+    @DisplayName("Test for find person By Id and delete Person")
     @Test
-    void givenIdPersonAndDeleteThisPerson() {
+    void givenIdPersonAndDeletePerson() {
         String personId = "321";
-        when(personRepository.findById(personId)).thenReturn(Optional.of(mockedPersonList.get(0)));
-        personService.deletePerson(personId);
+        when(personRepository.findById(personId)).thenReturn(Optional.of(personList.get(0)));
+        boolean resultPerson = personService.deletePerson(personId);
         verify(personRepository, times(1)).findById(personId);
-        verify(personRepository, times(1)).deleteById(personId);
-
-    }
-
-    @DisplayName("Test for find person By Id and return Person Not Find")
-    @Test
-    void givenIdPersonAndReturnPersonNotFindButNotDelete() {
-        String personId = "321";
-        when(personRepository.findById(personId)).thenReturn(Optional.empty());
-        assertThrows(EntityNotFoundException.class, () -> {
-            personService.findPersonById(personId);
-        });
+        verify(personRepository, times(1)).delete(personList.get(0));
+        assertTrue(resultPerson);
     }
 }

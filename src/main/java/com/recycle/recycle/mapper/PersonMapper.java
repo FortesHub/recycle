@@ -1,18 +1,23 @@
 package com.recycle.recycle.mapper;
 
 import com.recycle.recycle.domain.Person;
-import com.recycle.recycle.dto.personDTO;
+import com.recycle.recycle.dto.PersonDTO;
 
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;
 
+import java.util.Optional;
+
 @Mapper(componentModel = "spring")
 public interface PersonMapper {
-    personDTO convertToDTO(Person data);
-    Person convertToPerson(personDTO data);
+    PersonDTO convertToDTO(Person person);
+
+    Person convertToPerson(PersonDTO personDTO);
+
     @Mapping(target = "id", ignore = true)
-    Person updateDTOToPerson(personDTO updatedData, @MappingTarget Person person);
+    Person updateDTOToPerson(PersonDTO personDTO, @MappingTarget Person person);
+
 
 }
 

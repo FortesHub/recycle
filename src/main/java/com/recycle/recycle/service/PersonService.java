@@ -1,16 +1,15 @@
 package com.recycle.recycle.service;
 
 import com.recycle.recycle.domain.Person;
-import com.recycle.recycle.dto.personDTO;
+import com.recycle.recycle.dto.PersonDTO;
 import com.recycle.recycle.mapper.PersonMapper;
 import com.recycle.recycle.repository.PersonRepository;
 
-import jakarta.persistence.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-
+import java.util.Optional;
 
 @Service
 public class PersonService {
@@ -20,8 +19,8 @@ public class PersonService {
     @Autowired
     PersonMapper personMapper;
 
-    public personDTO registerPerson(personDTO data) {
-        Person newPerson = personMapper.convertToPerson(data);
+    public PersonDTO registerPerson(PersonDTO personDTO) {
+        Person newPerson = personMapper.convertToPerson(personDTO);
         Person savedPerson = this.personRepository.save(newPerson);
         return personMapper.convertToDTO(savedPerson);
     }
@@ -30,26 +29,32 @@ public class PersonService {
         return this.personRepository.findAll();
     }
 
-    public Person findPersonById(String id) {
-        return getPersonIfExist(id);
+    public Optional<Person> getPersonById(String id) {
+        return getPerson(id);
     }
 
-    public personDTO updatePerson(String id, personDTO data) {
-        Person existingPerson = getPersonIfExist(id);
-        existingPerson = personMapper.updateDTOToPerson(data, existingPerson);
-        Person updatedPerson = this.personRepository.save(existingPerson);
-        personDTO resultPerson = personMapper.convertToDTO(updatedPerson);
-        return resultPerson;
+    public PersonDTO updatePerson(String id, PersonDTO personDTO) {
+        Optional<Person> existingPerson = getPerson(id);
+        if (existingPerson.isPresent()) {
+            Person personToUpdate = existingPerson.get();
+            personMapper.updateDTOToPerson(personDTO, personToUpdate);
+            Person updatedPerson = this.personRepository.save(personToUpdate);
+            return personMapper.convertToDTO(updatedPerson);
+        }
+        return null;
     }
 
-    public void deletePerson(String id) {
-        getPersonIfExist(id);
-        personRepository.deleteById(id);
+    public boolean deletePerson(String id) {
+        Optional<Person> personToDelete = getPerson(id);
+        if (personToDelete.isPresent()) {
+            personRepository.delete(personToDelete.get());
+            return true;
+        }
+        return false;
     }
 
-    private Person getPersonIfExist(String id) {
-        return personRepository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException("Person Not Found"));
+    private Optional<Person> getPerson(String id) {
+        return personRepository.findById(id);
     }
 }
 
