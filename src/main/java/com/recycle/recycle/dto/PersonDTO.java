@@ -13,8 +13,8 @@ public record PersonDTO(
         String telephone, @NotBlank(message = "Empty email")
         String email, @Valid
         @NotNull(message = "The address is required.")
-        @ConvertGroup.List({
-                @ConvertGroup(from = Person.class, to = Address.class)
-        })
+        @ConvertGroup(from = Person.class, to = Address.class)
         AddressDTO address) {
 }
+
+

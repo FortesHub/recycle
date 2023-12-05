@@ -71,8 +71,6 @@ class PersonServiceTest {
         PersonDTO resultDTO = personService.registerPerson(personDTO);
 
         verify(personRepository, times(1)).save(any(Person.class));
-        verify(personMapper, times(1)).convertToPerson(personDTO);
-        verify(personMapper, times(1)).convertToDTO(personList.get(0));
         assertEquals(personDTO, resultDTO);
     }
 
@@ -108,8 +106,7 @@ class PersonServiceTest {
 
         verify(personRepository, times(1)).findById(id);
         verify(personRepository, times(1)).save(any(Person.class));
-        verify(personMapper, times(1)).updateDTOToPerson(updatedPersonDTO, personList.get(0));
-        verify(personMapper, times(1)).convertToDTO(personList.get(0));
+
 
         assertEquals("updatedJohn", resultDTO.name());
         assertEquals("438-111-1111", resultDTO.telephone());

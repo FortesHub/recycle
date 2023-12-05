@@ -1,13 +1,12 @@
 package com.recycle.recycle.domain;
 
 import jakarta.persistence.*;
-
-import jakarta.validation.constraints.NotBlank;
-import lombok.*;
-
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
 
 import javax.validation.Valid;
-import javax.validation.constraints.NotNull;
 
 @Table(name = "person")
 @Entity(name = "person")
@@ -16,7 +15,6 @@ import javax.validation.constraints.NotNull;
 @NoArgsConstructor
 @EqualsAndHashCode(of = "id")
 public class Person {
-
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     private String id;
@@ -28,5 +26,4 @@ public class Person {
     @JoinColumn(name = "address_id")
     @Valid
     private Address address;
-
 }

@@ -1,10 +1,10 @@
 package com.recycle.recycle.domain;
 
 import jakarta.persistence.*;
-
-import lombok.*;
-
-import javax.validation.constraints.NotNull;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
 
 
 @Table(name = "address")
@@ -22,5 +22,4 @@ public class Address {
     private String postalCode;
     private String city;
     private String pays;
-
 }
