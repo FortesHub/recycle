@@ -13,11 +13,13 @@ import java.util.Optional;
 
 @Service
 public class PersonService {
-    @Autowired
-    PersonRepository personRepository;
-
-    @Autowired
-    PersonMapper personMapper;
+    private PersonRepository personRepository;
+    private PersonMapper personMapper;
+@Autowired
+    public void personService(PersonRepository personRepository, PersonMapper personMapper){
+        this.personRepository = personRepository;
+        this.personMapper = personMapper;
+    }
 
     public PersonDTO registerPerson(PersonDTO personDTO) {
         Person newPerson = personMapper.convertToPerson(personDTO);

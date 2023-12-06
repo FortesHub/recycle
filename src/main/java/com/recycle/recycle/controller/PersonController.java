@@ -17,10 +17,11 @@ import java.util.Optional;
 @RestController()
 @RequestMapping("/person")
 public class PersonController {
-
+    private PersonService personService;
     @Autowired
-    PersonService personService;
-
+    public void personController(PersonService personService){
+        this.personService = personService;
+    }
 
     @PostMapping
     public ResponseEntity<PersonDTO> registerPerson(@Valid @RequestBody PersonDTO personDTO) {
@@ -47,6 +48,9 @@ public class PersonController {
     public ResponseEntity<PersonDTO> updatePerson(@PathVariable String id, @RequestBody @Valid PersonDTO
             personDTO) {
         PersonDTO person = personService.updatePerson(id, personDTO);
+        if(person == null){
+            throw new EntityNotFoundException("Person Not Found");
+        }
         return new ResponseEntity<>(person, HttpStatus.OK);
     }
 
