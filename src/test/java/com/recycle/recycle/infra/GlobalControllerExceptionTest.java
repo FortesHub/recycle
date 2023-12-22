@@ -23,7 +23,7 @@ import static org.mockito.Mockito.when;
 
 class GlobalControllerExceptionTest {
     @InjectMocks
-    GlobalControllerException globalControllerException = new GlobalControllerException();
+    GlobalControllerAdvice globalControllerException = new GlobalControllerAdvice();
     @Mock
     DataIntegrityViolationException dataIntegrityViolationException;
     @Mock
