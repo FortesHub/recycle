@@ -1,32 +1,35 @@
 package com.recycle.recycle.service;
 
 import com.recycle.recycle.domain.Address;
+import com.recycle.recycle.domain.AddressKey;
 import com.recycle.recycle.domain.Person;
 import com.recycle.recycle.dto.AddressDTO;
+import com.recycle.recycle.dto.AddressKeyDTO;
 import com.recycle.recycle.dto.PersonDTO;
 import com.recycle.recycle.mapper.PersonMapper;
 import com.recycle.recycle.repository.PersonRepository;
-import jakarta.persistence.EntityNotFoundException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mapstruct.factory.Mappers;
-import org.mockito.*;
-
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
+import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 class PersonServiceTest {
-
     @InjectMocks
     private PersonService personService;
     @Mock
@@ -46,16 +49,16 @@ class PersonServiceTest {
                 "John",
                 "438-111-1111",
                 "john@john.ca",
-                new AddressDTO("rue des johns",
+                new AddressDTO(new AddressKeyDTO("rue des johns",
                         "3",
-                        "j4k4j4",
+                        "j4k4j4"),
                         "Saint Jean Sur Richelieu",
                         "Canada")
         );
 
         addressList = Arrays.asList(
-                new Address(321L, "rue des johns", "3", "j4k4j4", "Saint Jean Sur Richelieu", "Canada"),
-                new Address(789L, "rue des Brin", "4", "j4k4j4", "Saint Jean Sur Richelieu", "Canada")
+                new Address(new AddressKey("rue des johns", "3", "j4k4j4"), "Saint Jean Sur Richelieu", "Canada"),
+                new Address(new AddressKey("rue des Brin", "4", "j4k4j4"), "Saint Jean Sur Richelieu", "Canada")
         );
 
         personList = Arrays.asList(
@@ -69,7 +72,6 @@ class PersonServiceTest {
     void givenPersonObject_whenRegisterPerson() {
         when(personRepository.save(any(Person.class))).thenReturn(personList.get(0));
         PersonDTO resultDTO = personService.registerPerson(personDTO);
-
         verify(personRepository, times(1)).save(any(Person.class));
         assertEquals(personDTO, resultDTO);
     }
@@ -97,23 +99,20 @@ class PersonServiceTest {
     @Test
     void givenIdPersonAndUpdatePerson() {
         String id = "321";
-        PersonDTO updatedPersonDTO = new PersonDTO("updatedJohn", "438-111-1111", "updatedjohn@gmail.com", new AddressDTO("rue des johns",
-                "3", "j4k4j4", "Saint Jean Sur Richelieu", "Canada"));
+        PersonDTO updatedPersonDTO = new PersonDTO("updatedJohn", "438-111-1111", "updatedjohn@gmail.com", new AddressDTO(new AddressKeyDTO("rue des johns",
+                "3", "j4k4j4"), "Saint Jean Sur Richelieu", "Canada"));
+        Person personDTOtoPerson =  new Person("321", "updatedJohn", "438-111-1111", "updatedjohn@gmail.com", new Address(new AddressKey("rue des johns",
+                "3", "j4k4j4"), "Saint Jean Sur Richelieu", "Canada"));
 
-        when(personRepository.findById(id)).thenReturn(Optional.of(personList.get(0)));
-        when(personRepository.save(any())).thenReturn(personList.get(0));
-        PersonDTO resultDTO = personService.updatePerson(id, updatedPersonDTO);
-
-        verify(personRepository, times(1)).findById(id);
+        when(personRepository.save(any(Person.class))).thenReturn(personDTOtoPerson);
+        PersonDTO resultDTO = personService.updatePerson(personDTOtoPerson.getPersonId(), updatedPersonDTO);
         verify(personRepository, times(1)).save(any(Person.class));
-
-
         assertEquals("updatedJohn", resultDTO.name());
         assertEquals("438-111-1111", resultDTO.telephone());
         assertEquals("updatedjohn@gmail.com", resultDTO.email());
-        assertEquals("rue des johns", resultDTO.address().street());
-        assertEquals("3", resultDTO.address().complement());
-        assertEquals("j4k4j4", resultDTO.address().postalCode());
+        assertEquals("rue des johns", resultDTO.address().addressKey().street());
+        assertEquals("3", resultDTO.address().addressKey().complement());
+        assertEquals("j4k4j4", resultDTO.address().addressKey().postalCode());
         assertEquals("Saint Jean Sur Richelieu", resultDTO.address().city());
         assertEquals("Canada", resultDTO.address().pays());
     }

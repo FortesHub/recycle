@@ -8,13 +8,10 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.validation.groups.ConvertGroup;
 
 public record PersonDTO(
-        @NotBlank(message = "Empty name")
-        String name, @NotBlank(message = "Empty telephone")
-        String telephone, @NotBlank(message = "Empty email")
-        String email, @Valid
-        @NotNull(message = "The address is required.")
-        @ConvertGroup(from = Person.class, to = Address.class)
-        AddressDTO address) {
-}
+        @NotBlank(message = "Empty name") String name,
+        @NotBlank(message = "Empty telephone") String telephone,
+        @NotBlank(message = "Empty email") String email,
+        @Valid @NotNull(message = "The address is required.")
+        AddressDTO address) {}
 
 

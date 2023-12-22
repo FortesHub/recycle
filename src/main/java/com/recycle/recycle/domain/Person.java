@@ -13,17 +13,19 @@ import javax.validation.Valid;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-@EqualsAndHashCode(of = "id")
+@EqualsAndHashCode(of = "personId")
 public class Person {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
-    private String id;
+    private String personId;
     private String name;
     private String telephone;
     @Column(unique = true)
     private String email;
     @ManyToOne(cascade = CascadeType.ALL)
-    @JoinColumn(name = "address_id")
+    @JoinColumn(name = "street", referencedColumnName = "street")
+    @JoinColumn(name = "complement", referencedColumnName = "complement")
+    @JoinColumn(name = "postalCode", referencedColumnName = "postalCode")
     @Valid
     private Address address;
 }

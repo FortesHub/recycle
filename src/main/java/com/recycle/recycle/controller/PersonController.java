@@ -1,10 +1,12 @@
 package com.recycle.recycle.controller;
 
 import com.recycle.recycle.domain.Person;
+import com.recycle.recycle.dto.ExceptionDTO;
 import com.recycle.recycle.dto.PersonDTO;
 import com.recycle.recycle.service.PersonService;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -13,20 +15,28 @@ import javax.validation.Valid;
 import java.util.List;
 import java.util.Optional;
 
-
 @RestController()
 @RequestMapping("/person")
 public class PersonController {
     private PersonService personService;
+    private String notFound = "Person Not Found!";
+    private String alreadyExist = "Person Already Exist";
+    private String deleted = "Person deleted successfully!";
+
     @Autowired
-    public void personController(PersonService personService){
+    public void personController(PersonService personService) {
         this.personService = personService;
     }
 
     @PostMapping
-    public ResponseEntity<PersonDTO> registerPerson(@Valid @RequestBody PersonDTO personDTO) {
-        PersonDTO newPerson = personService.registerPerson(personDTO);
-        return new ResponseEntity<>(newPerson, HttpStatus.CREATED);
+    public ResponseEntity<?> registerPerson(@Valid @RequestBody PersonDTO personDTO) {
+        try {
+            PersonDTO newPerson = personService.registerPerson(personDTO);
+            return new ResponseEntity<>(newPerson, HttpStatus.CREATED);
+        } catch (DataIntegrityViolationException ex) {
+            ExceptionDTO exception = new ExceptionDTO(alreadyExist, HttpStatus.CONFLICT.value());
+            return ResponseEntity.status(exception.statusCode()).body(exception);
+        }
     }
 
     @GetMapping
@@ -35,31 +45,33 @@ public class PersonController {
         return new ResponseEntity<>(persons, HttpStatus.OK);
     }
 
-    @GetMapping("/{id}")
-    public ResponseEntity<?> getPersonById(@PathVariable("id") String id) {
-        Optional<Person> person = personService.getPersonById(id);
-        if(person.isEmpty()){
-            throw new EntityNotFoundException("Person Not Found");
+    @GetMapping("/{personId}")
+    public ResponseEntity<?> getPersonById(@PathVariable("personId") String personId) {
+        Optional<Person> person = personService.getPersonById(personId);
+        if (person.isPresent()) {
+            return new ResponseEntity<>(person, HttpStatus.OK);
         }
-        return new ResponseEntity<>(person, HttpStatus.OK);
+        throw new EntityNotFoundException(notFound);
     }
 
-    @PutMapping("/{id}")
-    public ResponseEntity<PersonDTO> updatePerson(@PathVariable String id, @RequestBody @Valid PersonDTO
+    @PutMapping("/{personId}")
+    public ResponseEntity<?> updatePerson(@PathVariable("personId") String personId, @RequestBody @Valid PersonDTO
             personDTO) {
-        PersonDTO person = personService.updatePerson(id, personDTO);
-        if(person == null){
-            throw new EntityNotFoundException("Person Not Found");
+        try {
+            PersonDTO updatedPerson = personService.updatePerson(personId, personDTO);
+            return new ResponseEntity<>(updatedPerson, HttpStatus.OK);
+        } catch (DataIntegrityViolationException ex) {
+            ExceptionDTO exception = new ExceptionDTO(notFound, HttpStatus.NOT_FOUND.value());
+            return ResponseEntity.status(exception.statusCode()).body(exception);
         }
-        return new ResponseEntity<>(person, HttpStatus.OK);
     }
 
-    @DeleteMapping("/{id}")
-    public ResponseEntity<?> deletePerson(@PathVariable String id) {
-        Boolean wasDeleted = personService.deletePerson(id);
-        if (!wasDeleted) {
-            throw new EntityNotFoundException("Person Not Found");
+    @DeleteMapping("/{personId}")
+    public ResponseEntity<?> deletePerson(@PathVariable String personId) {
+        Boolean wasDeleted = personService.deletePerson(personId);
+        if (wasDeleted) {
+            return new ResponseEntity<>(deleted, HttpStatus.OK);
         }
-        return new ResponseEntity<>("Person deleted successfully!", HttpStatus.OK);
+        throw new EntityNotFoundException(notFound);
     }
 }

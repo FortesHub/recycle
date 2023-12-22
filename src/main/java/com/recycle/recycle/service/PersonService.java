@@ -4,7 +4,6 @@ import com.recycle.recycle.domain.Person;
 import com.recycle.recycle.dto.PersonDTO;
 import com.recycle.recycle.mapper.PersonMapper;
 import com.recycle.recycle.repository.PersonRepository;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -15,8 +14,9 @@ import java.util.Optional;
 public class PersonService {
     private PersonRepository personRepository;
     private PersonMapper personMapper;
-@Autowired
-    public void personService(PersonRepository personRepository, PersonMapper personMapper){
+
+    @Autowired
+    public void personService(PersonRepository personRepository, PersonMapper personMapper) {
         this.personRepository = personRepository;
         this.personMapper = personMapper;
     }
@@ -31,33 +31,23 @@ public class PersonService {
         return this.personRepository.findAll();
     }
 
-    public Optional<Person> getPersonById(String id) {
-        return getPerson(id);
+    public Optional<Person> getPersonById(String personId) {
+        return personRepository.findById(personId);
     }
 
-    public PersonDTO updatePerson(String id, PersonDTO personDTO) {
-        Optional<Person> existingPerson = getPerson(id);
-        if (existingPerson.isPresent()) {
-            Person personToUpdate = existingPerson.get();
-            personMapper.updateDTOToPerson(personDTO, personToUpdate);
-            Person updatedPerson = this.personRepository.save(personToUpdate);
-            return personMapper.convertToDTO(updatedPerson);
-        }
-        return null;
+    public PersonDTO updatePerson(String personId, PersonDTO personDTO) {
+        Person personToUpdate = personMapper.convertToPerson(personDTO);
+        personToUpdate.setPersonId(personId);
+        Person updatedPerson = this.personRepository.save(personToUpdate);
+        return personMapper.convertToDTO(updatedPerson);
     }
 
-    public boolean deletePerson(String id) {
-        Optional<Person> personToDelete = getPerson(id);
+    public boolean deletePerson(String personId) {
+        Optional<Person> personToDelete = getPersonById(personId);
         if (personToDelete.isPresent()) {
             personRepository.delete(personToDelete.get());
             return true;
         }
         return false;
     }
-
-    private Optional<Person> getPerson(String id) {
-        return personRepository.findById(id);
-    }
 }
-
-
