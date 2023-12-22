@@ -13,17 +13,17 @@ import java.util.HashMap;
 import java.util.Map;
 
 @ControllerAdvice
-public class GlobalControllerException{
+public class GlobalControllerAdvice {
 
     @ExceptionHandler(DataIntegrityViolationException.class)
-    public ResponseEntity threatDuplicateEntry(DataIntegrityViolationException exception){
-        ExceptionDTO exceptionDTO = new ExceptionDTO("Already exist", 409);
+    public ResponseEntity<ExceptionDTO> threatDuplicateEntry(DataIntegrityViolationException exception){
+        ExceptionDTO exceptionDTO = new ExceptionDTO(exception.getMessage(), HttpStatus.CONFLICT.value());
         return ResponseEntity.status(HttpStatus.CONFLICT).body(exceptionDTO);
     }
 
     @ExceptionHandler(EntityNotFoundException.class)
     public ResponseEntity<ExceptionDTO> handleEntityNotFoundException(EntityNotFoundException exception){
-        ExceptionDTO exceptionDTO = new ExceptionDTO(exception.getMessage(), 404);
+        ExceptionDTO exceptionDTO = new ExceptionDTO(exception.getMessage(), HttpStatus.NOT_FOUND.value());
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(exceptionDTO);
     }
 
