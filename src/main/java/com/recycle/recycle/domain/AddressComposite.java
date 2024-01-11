@@ -13,7 +13,7 @@ import java.io.Serializable;
 @AllArgsConstructor
 @NoArgsConstructor
 @EqualsAndHashCode
-public class AddressKey implements Serializable {
+public class AddressComposite implements Serializable {
     private String street;
     private String complement;
     private String postalCode;

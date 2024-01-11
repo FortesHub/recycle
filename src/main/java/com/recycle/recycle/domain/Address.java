@@ -15,9 +15,9 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 @EqualsAndHashCode
-public class Address {
+public class Address{
     @EmbeddedId
-    private AddressKey addressKey;
+    private AddressComposite addressComposite;
     private String city;
     private String pays;
 }
