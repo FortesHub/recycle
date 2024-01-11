@@ -15,7 +15,7 @@ import javax.validation.Valid;
 import java.util.List;
 import java.util.Optional;
 
-@RestController()
+@RestController
 @RequestMapping("/person")
 public class PersonController {
     private PersonService personService;
@@ -41,7 +41,7 @@ public class PersonController {
 
     @GetMapping
     public ResponseEntity<List<Person>> getAllPersons() {
-        List<Person> persons = this.personService.getAllPerson();
+        List<Person> persons = personService.getAllPerson();
         return new ResponseEntity<>(persons, HttpStatus.OK);
     }
 
