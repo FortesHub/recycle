@@ -11,7 +11,7 @@ import java.util.List;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-@EqualsAndHashCode(of = "id")
+@EqualsAndHashCode(of = "machineId")
 public class Machine {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)

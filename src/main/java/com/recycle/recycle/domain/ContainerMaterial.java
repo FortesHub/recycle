@@ -9,7 +9,7 @@ import lombok.*;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-@EqualsAndHashCode(of = "id")
+@EqualsAndHashCode(of = "containerId")
 public class ContainerMaterial {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
