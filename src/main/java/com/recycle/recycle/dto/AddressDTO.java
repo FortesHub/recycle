@@ -6,7 +6,7 @@ import jakarta.validation.constraints.NotNull;
 
 public record AddressDTO(
         @Valid @NotNull(message = "The addressKey is required.")
-        AddressKeyDTO addressComposite,
+        AddressCompositeDTO addressComposite,
         @NotBlank(message = "Empty City") String city,
         @NotBlank(message = "Empty Pays") String pays) {
     }

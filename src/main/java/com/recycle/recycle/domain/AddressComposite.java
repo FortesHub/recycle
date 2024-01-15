@@ -18,3 +18,4 @@ public class AddressComposite implements Serializable {
     private String complement;
     private String postalCode;
 }
+
