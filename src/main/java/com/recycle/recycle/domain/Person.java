@@ -10,6 +10,7 @@ import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
 import javax.validation.Valid;
+import java.util.ArrayList;
 import java.util.List;
 
 @Table(name = "person")
@@ -39,5 +40,5 @@ public class Person{
             joinColumns = @JoinColumn(name = "company_id"),
             inverseJoinColumns = @JoinColumn(name = "person_id")
     )
-    private List<Company> companies;
+    private List<Company> companies = new ArrayList<>();
 }

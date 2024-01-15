@@ -3,6 +3,7 @@ package com.recycle.recycle.controller;
 import com.recycle.recycle.domain.Person;
 import com.recycle.recycle.dto.ExceptionDTO;
 import com.recycle.recycle.dto.PersonDTO;
+import com.recycle.recycle.service.CompanyService;
 import com.recycle.recycle.service.PersonService;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,9 +23,8 @@ public class PersonController {
     private String notFound = "Person Not Found!";
     private String alreadyExist = "Person Already Exist";
     private String deleted = "Person deleted successfully!";
-
     @Autowired
-    public void personController(PersonService personService) {
+    public void personController(PersonService personService){
         this.personService = personService;
     }
 
