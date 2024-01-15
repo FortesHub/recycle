@@ -1,5 +1,5 @@
 package com.recycle.recycle.dto;
 
-public record ExceptionDTO(String message, Integer statusCode) {
-
-}
+public record ExceptionDTO(
+        String message,
+        Integer statusCode) {}

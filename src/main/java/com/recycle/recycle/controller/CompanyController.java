@@ -2,10 +2,11 @@ package com.recycle.recycle.controller;
 
 import com.recycle.recycle.domain.Company;
 import com.recycle.recycle.dto.CompanyDTO;
+import com.recycle.recycle.dto.ExceptionDTO;
 import com.recycle.recycle.service.CompanyService;
-import com.recycle.recycle.service.PersonService;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -19,15 +20,24 @@ import java.util.Optional;
 public class CompanyController {
 
     private CompanyService companyService;
+    private String notFound = "Company Not Found!";
+    private String alreadyExist = "Company Already Exist";
+    private String deleted = "Company deleted successfully!";
+
     @Autowired
-    public void companyController(CompanyService companyService, PersonService personService) {
+    public void companyController(CompanyService companyService) {
         this.companyService = companyService;
     }
 
     @PostMapping
-    public ResponseEntity<CompanyDTO> registerCompany(@Valid @RequestBody CompanyDTO companyDTO) {
+    public ResponseEntity<?> registerCompany(@Valid @RequestBody CompanyDTO companyDTO) {
+        try {
             CompanyDTO registredCompany = companyService.registerCompany(companyDTO);
             return new ResponseEntity<>(registredCompany, HttpStatus.CREATED);
+        } catch (DataIntegrityViolationException ex) {
+            ExceptionDTO exception = new ExceptionDTO(alreadyExist, HttpStatus.CONFLICT.value());
+            return ResponseEntity.status(exception.statusCode()).body(exception);
+        }
     }
 
     @GetMapping
@@ -41,24 +51,27 @@ public class CompanyController {
         if (existingCompany.isPresent()) {
             return new ResponseEntity<>(existingCompany, HttpStatus.OK);
         }
-        throw new EntityNotFoundException("Company Not Found");
+        throw new EntityNotFoundException(notFound);
     }
 
     @PutMapping("/{companyId}")
-    public ResponseEntity<CompanyDTO> updateCompany(@PathVariable("companyId") String companyId, @RequestBody CompanyDTO companyDTO) {
-        CompanyDTO existingCompany = companyService.updateCompany(companyId, companyDTO);
-        if (existingCompany == null) {
-            throw new EntityNotFoundException("Company not Found");
+    public ResponseEntity<?> updateCompany(@PathVariable("companyId") String companyId, @RequestBody CompanyDTO companyDTO) {
+        try {
+            CompanyDTO existingCompany = companyService.updateCompany(companyId, companyDTO);
+            return new ResponseEntity<>(existingCompany, HttpStatus.OK);
+        } catch (DataIntegrityViolationException ex) {
+            ExceptionDTO exception = new ExceptionDTO(notFound, HttpStatus.NOT_FOUND.value());
+            return ResponseEntity.status(exception.statusCode()).body(exception);
         }
-        return new ResponseEntity<>(existingCompany, HttpStatus.OK);
     }
 
     @DeleteMapping("/{companyId}")
-    public ResponseEntity<?> deleteCompany(@PathVariable("companyId") String companyId){
+    public ResponseEntity<?> deleteCompany(@PathVariable("companyId") String companyId) {
         Boolean wasDeleted = companyService.deleteCompany(companyId);
-        if(!wasDeleted){
-            throw new EntityNotFoundException("Person Not Found");
-        }return new ResponseEntity<>("Company deleted successfully", HttpStatus.OK);
+        if (wasDeleted) {
+            return new ResponseEntity<>(deleted, HttpStatus.OK);
+        }
+        throw new EntityNotFoundException(notFound);
     }
 }
 

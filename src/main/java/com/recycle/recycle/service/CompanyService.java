@@ -34,11 +34,11 @@ public class CompanyService {
         return companyMapper.convertToDTO(savedCompany);
     }
 
-    public List<Company> getAllCompany() {
+    public List<Company> getAllCompany(){
         return companyRepository.findAll();
     }
 
-    public Optional<Company> getCompanyById(String companyId) {
+    public Optional<Company> getCompanyById(String companyId){
         return companyRepository.findById(companyId);
     }
 
