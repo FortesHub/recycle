@@ -23,6 +23,7 @@ class CompanyMapperTest {
     private AddressComposite addressComposite = new AddressComposite("rue des johns", "3", "j4k4j4");
     private Address address = new Address(addressComposite, "Saint Jean Sur Richelieu", "Canada");
     List<String> companyIds = Arrays.asList("123");
+    List<String> establishmentIds = Arrays.asList("321");
 
     private PersonDTO personDTO = new PersonDTO(
             "John",
@@ -31,7 +32,7 @@ class CompanyMapperTest {
             new AddressDTO(new AddressCompositeDTO("John", "3",
                     "j4k4j4"),
                     "Saint Jean Sur Richelieu",
-                    "Canada"), companyIds
+                    "Canada"), companyIds, establishmentIds
     );
 
     @Test

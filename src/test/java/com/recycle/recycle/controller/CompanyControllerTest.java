@@ -53,7 +53,7 @@ class CompanyControllerTest {
                         "Saint Jean Sur Richelieu", "Canada"));
         personList = Arrays.asList(
                 new Person("personId123", "John Doe", "123456789",
-                        "john.doe@example.com", addressList.get(0), List.of()));
+                        "john.doe@example.com", addressList.get(0), List.of(), List.of()));
         companyList = Arrays.asList(
                 new Company("companyId1", "Company1", "123456789",
                         "company@example.com", addressList.get(0), List.of()));

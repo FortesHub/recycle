@@ -7,9 +7,7 @@ import com.recycle.recycle.domain.Person;
 import com.recycle.recycle.dto.AddressCompositeDTO;
 import com.recycle.recycle.dto.AddressDTO;
 import com.recycle.recycle.dto.CompanyDTO;
-import com.recycle.recycle.dto.PersonDTO;
 import com.recycle.recycle.mapper.CompanyMapper;
-import com.recycle.recycle.repository.AddressRepository;
 import com.recycle.recycle.repository.CompanyRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -36,7 +34,7 @@ class CompanyServiceTest {
     @Mock
     CompanyRepository companyRepository;
     @Mock
-    AddressRepository addressRepository;
+    EntityService addressService;
     @Spy
     CompanyMapper companyMapper = Mappers.getMapper(CompanyMapper.class);
     CompanyDTO companyDTO;
@@ -51,10 +49,10 @@ class CompanyServiceTest {
                         "Saint Jean Sur Richelieu", "Canada"));
         personList = Arrays.asList(
                 new Person("personId123", "John Doe", "123456789",
-                        "john.doe@example.com", addressList.get(0), List.of()));
+                        "john.doe@example.com", addressList.get(0), List.of(), List.of()));
         companyList = Arrays.asList(
                 new Company("companyId1", "Company1", "123456789",
-                "company@example.com", addressList.get(0), List.of()));
+                        "company@example.com", addressList.get(0), List.of()));
         companyDTO = new CompanyDTO(
                 "Company1",
                 "123456789",
@@ -67,11 +65,11 @@ class CompanyServiceTest {
     @DisplayName("Test for register Company and return Company")
     @Test
     void givenCompanyWhenGetCompany() {
-        when(addressRepository.findByAddressComposite(any())).thenReturn(addressList.get(0));
+        when(addressService.getAddress(any())).thenReturn(addressList.get(0));
         when(companyRepository.save(any(Company.class))).thenReturn(companyList.get(0));
         CompanyDTO registeredCompany = companyService.registerCompany(companyDTO);
         verify(companyRepository, times(1)).save(any(Company.class));
-        verify(addressRepository, times(1)).findByAddressComposite(addressList.get(0).getAddressComposite());
+        verify(addressService, times(1)).getAddress(addressList.get(0));
         assertEquals(companyDTO, registeredCompany);
     }
 
@@ -104,11 +102,11 @@ class CompanyServiceTest {
                 new AddressDTO(new AddressCompositeDTO("rue des johns", "3", "j4k4j4"),
                         "Saint Jean Sur Richelieu",
                         "Canada"), List.of());
-        Company companydtoToCompany = new Company("companyId1","Company2", "123456789",
+        Company companydtoToCompany = new Company("companyId1", "Company2", "123456789",
                 "company@example.com", addressList.get(0), List.of());
         when(companyRepository.save(any(Company.class))).thenReturn(companydtoToCompany);
         CompanyDTO resultCompany = companyService.updateCompany(companyId, companyDTO);
-              verify(companyRepository, times(1)).save(companyList.get(0));
+        verify(companyRepository, times(1)).save(companyList.get(0));
         assertEquals("Company2", resultCompany.name());
     }
 
