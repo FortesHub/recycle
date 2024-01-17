@@ -1,5 +1,7 @@
 package com.recycle.recycle.dto;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -12,7 +14,10 @@ public record PersonDTO(
         @NotBlank(message = "Empty email") String email,
         @Valid @NotNull(message = "The address is required.")
         AddressDTO address,
-        List<String> companyIds) {
+        @JsonIgnoreProperties
+        List<String> companyIds,
+        @JsonIgnoreProperties
+        List<String> establishmentIds) {
 }
 
 

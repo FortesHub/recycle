@@ -1,9 +1,6 @@
 package com.recycle.recycle.controller;
 
-import com.recycle.recycle.domain.Address;
-import com.recycle.recycle.domain.AddressComposite;
-import com.recycle.recycle.domain.Company;
-import com.recycle.recycle.domain.Person;
+import com.recycle.recycle.domain.*;
 import com.recycle.recycle.dto.AddressCompositeDTO;
 import com.recycle.recycle.dto.AddressDTO;
 import com.recycle.recycle.dto.ExceptionDTO;
@@ -43,6 +40,7 @@ class PersonControllerTest {
     private List<Person> personList;
     private List<Company> companies;
     private List<Address> addressList;
+    private List<Establishment> establishments;
     private String personNotFound = "Person Not Found!";
     private String personAlreadyExist = "Person Already Exist";
     private String pesonDeleted = "Person deleted successfully!";
@@ -56,13 +54,17 @@ class PersonControllerTest {
                         "Saint Jean Sur Richelieu", "Canada"));
         personDTO = new PersonDTO("John Doe", "123456789", "john.doe@example.com",
                 new AddressDTO(new AddressCompositeDTO("rue des johns", "3", "j4k4j4"),
-                        "Saint Jean Sur Richelieu", "Canada"), List.of("companyId1", "companyId2"));
+                        "Saint Jean Sur Richelieu", "Canada"), List.of("companyId1", "companyId2"), List.of("establishmentId1"));
         personList = Arrays.asList(
                 new Person("personId123", "John Doe", "123456789",
-                        "john.doe@example.com", addressList.get(0), List.of()));
+                        "john.doe@example.com", addressList.get(0), List.of(), List.of()));
         companies = Arrays.asList(
                 new Company("companyId1", "Company1", "123456789",
                         "company@example.com", addressList.get(0), List.of()));
+
+        establishments = Arrays.asList(
+                new Establishment("establishmentId1", "Establishment1", "123456789",
+                        "establishment@example.com", addressList.get(0), List.of()));
 
     }
 
@@ -124,7 +126,7 @@ class PersonControllerTest {
     void whenUpdatePersonReturnOk() {
         String personId = "321";
         PersonDTO updatedPersonDTO = new PersonDTO("updatedJohn", "438-111-1111", "updatedjohn@gmail.com",new AddressDTO(new AddressCompositeDTO("rue des Pines", "3", "j4k4j4"),
-                "Saint Jean Sur Richelieu", "Canada"), List.of("companyId1"));
+                "Saint Jean Sur Richelieu", "Canada"), List.of("companyId1"), List.of("establishmentId1"));
         when(personService.updatePerson(personId, personDTO)).thenReturn(updatedPersonDTO);
         ResponseEntity<?> response = personController.updatePerson(personId, personDTO);
         assertEquals(HttpStatus.OK, response.getStatusCode());
@@ -136,7 +138,7 @@ class PersonControllerTest {
     void whenUpdatePersonThrowException() {
         String personId = "321";
         PersonDTO updatedPersonDTO = new PersonDTO("updatedJohn", "438-111-1111", "updatedjohn@gmail.com",new AddressDTO(new AddressCompositeDTO("rue des Pines", "3", "j4k4j4"),
-                "Saint Jean Sur Richelieu", "Canada"), List.of("companyId1"));
+                "Saint Jean Sur Richelieu", "Canada"), List.of("companyId1"), List.of("establishmentId1"));
         when(personService.updatePerson(personId, personDTO)).thenThrow(new DataIntegrityViolationException(personNotFound));
         ResponseEntity<?> response = personController.updatePerson(personId, personDTO);
         ExceptionDTO exception = (ExceptionDTO) response.getBody();

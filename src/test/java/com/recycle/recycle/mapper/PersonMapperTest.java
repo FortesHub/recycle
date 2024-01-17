@@ -2,6 +2,7 @@ package com.recycle.recycle.mapper;
 
 import com.recycle.recycle.domain.AddressComposite;
 import com.recycle.recycle.domain.Company;
+import com.recycle.recycle.domain.Establishment;
 import com.recycle.recycle.domain.Person;
 import com.recycle.recycle.dto.AddressCompositeDTO;
 import com.recycle.recycle.dto.AddressDTO;
@@ -28,7 +29,12 @@ class PersonMapperTest {
         Company company1 = new Company();
         company1.setName("company1");
 
+        List<Establishment> establishments = new ArrayList<>();
+        Establishment establishment1 = new Establishment();
+        establishment1.setName("establishment1");
+
         person.setCompanies(companies);
+        person.setEstablishments(establishments);
 
         PersonDTO personDTO = personMapper.convertToDTO(person);
         assertEquals(person.getName(), personDTO.name());
@@ -39,8 +45,8 @@ class PersonMapperTest {
         AddressCompositeDTO addressKey = new AddressCompositeDTO("Rue Saint Jean", "2", "J2w2T5");
         AddressDTO addressDTO = new AddressDTO(addressKey, "Saint Jean", "Canada");
         List<String> companyIds = Arrays.asList("123");
-
-        PersonDTO personDTO = new PersonDTO("iga", "438-111-1111", "iga@iga.com", addressDTO, companyIds);
+        List<String> establishmentIds = Arrays.asList("321");
+        PersonDTO personDTO = new PersonDTO("iga", "438-111-1111", "iga@iga.com", addressDTO, companyIds, establishmentIds);
         Person person = personMapper.convertToPerson(personDTO);
         assertEquals(personDTO.name(), person.getName());
     }

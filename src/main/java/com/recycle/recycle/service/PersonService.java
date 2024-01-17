@@ -2,43 +2,41 @@ package com.recycle.recycle.service;
 
 import com.recycle.recycle.domain.Address;
 import com.recycle.recycle.domain.Company;
+import com.recycle.recycle.domain.Establishment;
 import com.recycle.recycle.domain.Person;
 import com.recycle.recycle.dto.PersonDTO;
 import com.recycle.recycle.mapper.PersonMapper;
-import com.recycle.recycle.repository.AddressRepository;
-import com.recycle.recycle.repository.CompanyRepository;
 import com.recycle.recycle.repository.PersonRepository;
-import jakarta.persistence.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
 @Service
 public class PersonService {
     private PersonRepository personRepository;
-    private AddressRepository addressRepository;
-    private CompanyRepository companyRepository;
+    private EntityService entityService;
     private PersonMapper personMapper;
 
     @Autowired
     public void personService(PersonRepository personRepository,
                               PersonMapper personMapper,
-                              AddressRepository addressRepository,
-                              CompanyRepository companyRepository) {
+                              EntityService entityService) {
         this.personRepository = personRepository;
         this.personMapper = personMapper;
-        this.addressRepository = addressRepository;
-        this.companyRepository = companyRepository;
+        this.entityService = entityService;
     }
 
     public PersonDTO registerPerson(PersonDTO personDTO) {
-        List<Company> companies = getCompanies(personDTO);
+        List<Company> companies = entityService.getCompanies(personDTO.companyIds());
+        List<Establishment> establishments = entityService.getEstablishments(personDTO.establishmentIds());
         Person newPerson = personMapper.convertToPerson(personDTO);
+        Address address = entityService.getAddress(newPerson.getAddress());
+        newPerson.setAddress(address);
         newPerson.setCompanies(companies);
-        getAddress(newPerson);
+        newPerson.setEstablishments(establishments);
+
         Person savedPerson = personRepository.save(newPerson);
         return personMapper.convertToDTO(savedPerson);
     }
@@ -52,10 +50,13 @@ public class PersonService {
     }
 
     public PersonDTO updatePerson(String personId, PersonDTO personDTO) {
-        List<Company> companies = getCompanies(personDTO);
+        List<Company> companies = entityService.getCompanies(personDTO.companyIds());
+        List<Establishment> establishments = entityService.getEstablishments(personDTO.establishmentIds());
         Person personToUpdate = personMapper.convertToPerson(personDTO);
+        Address address = entityService.getAddress(personToUpdate.getAddress());
+        personToUpdate.setAddress(address);
         personToUpdate.setCompanies(companies);
-        getAddress(personToUpdate);
+        personToUpdate.setEstablishments(establishments);
         personToUpdate.setPersonId(personId);
         Person updatedPerson = personRepository.save(personToUpdate);
         return personMapper.convertToDTO(updatedPerson);
@@ -70,26 +71,4 @@ public class PersonService {
         return false;
     }
 
-    public Person getAddress(Person person) {
-        Address existingAddress = addressRepository.findByAddressComposite(person.getAddress().getAddressComposite());
-        if (existingAddress != null) {
-            person.setAddress(existingAddress);
-        } else {
-            Address address = addressRepository.save(person.getAddress());
-            person.setAddress(address);
-        }
-        return person;
-    }
-
-    public List<Company> getCompanies(PersonDTO personDTO) {
-        List<Company> companies = new ArrayList<>();
-        if (personDTO.companyIds() != null) {
-            for (String companyId : personDTO.companyIds()) {
-                Company company = companyRepository.findById(companyId)
-                        .orElseThrow(() -> new EntityNotFoundException("Company not found with id: " + companyId));
-                companies.add(company);
-            }
-        }
-        return companies;
-    }
 }

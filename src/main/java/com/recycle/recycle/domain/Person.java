@@ -19,7 +19,7 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 @EqualsAndHashCode(of = "personId")
-@JsonIgnoreProperties({"companies"})
+@JsonIgnoreProperties({"companies", "establishments"})
 public class Person{
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
@@ -41,4 +41,11 @@ public class Person{
             inverseJoinColumns = @JoinColumn(name = "person_id")
     )
     private List<Company> companies = new ArrayList<>();
+    @ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE}, fetch = FetchType.EAGER)
+    @JoinTable(
+            name = "establishment_person",
+            joinColumns = @JoinColumn(name = "establishment_id"),
+            inverseJoinColumns = @JoinColumn(name = "person_id")
+    )
+    private List<Establishment> establishments = new ArrayList<>();
 }
