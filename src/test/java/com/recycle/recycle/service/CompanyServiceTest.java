@@ -34,7 +34,7 @@ class CompanyServiceTest {
     @Mock
     CompanyRepository companyRepository;
     @Mock
-    EntityService addressService;
+    EntityService entityService;
     @Spy
     CompanyMapper companyMapper = Mappers.getMapper(CompanyMapper.class);
     CompanyDTO companyDTO;
@@ -65,11 +65,11 @@ class CompanyServiceTest {
     @DisplayName("Test for register Company and return Company")
     @Test
     void givenCompanyWhenGetCompany() {
-        when(addressService.getAddress(any())).thenReturn(addressList.get(0));
+        when(entityService.getAddress(any())).thenReturn(addressList.get(0));
         when(companyRepository.save(any(Company.class))).thenReturn(companyList.get(0));
         CompanyDTO registeredCompany = companyService.registerCompany(companyDTO);
         verify(companyRepository, times(1)).save(any(Company.class));
-        verify(addressService, times(1)).getAddress(addressList.get(0));
+        verify(entityService, times(1)).getAddress(addressList.get(0));
         assertEquals(companyDTO, registeredCompany);
     }
 

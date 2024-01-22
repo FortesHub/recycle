@@ -18,7 +18,6 @@ import java.util.Optional;
 @RequestMapping("/company")
 @RestController()
 public class CompanyController {
-
     private CompanyService companyService;
     private String notFound = "Company Not Found!";
     private String alreadyExist = "Company Already Exist";
