@@ -1,32 +1,36 @@
 package com.recycle.recycle.service;
 
-import com.recycle.recycle.domain.Address;
-import com.recycle.recycle.domain.Company;
-import com.recycle.recycle.domain.Establishment;
-import com.recycle.recycle.repository.AddressRepository;
-import com.recycle.recycle.repository.CompanyRepository;
-import com.recycle.recycle.repository.EstablishmentRepository;
+import com.recycle.recycle.domain.*;
+import com.recycle.recycle.repository.*;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class EntityService {
     private AddressRepository addressRepository;
     private CompanyRepository companyRepository;
     private EstablishmentRepository establishmentRepository;
+    private MaterialRepository materialRepository;
+    private ContainerRepository containerRepository;
 
 
     @Autowired
     public void addressService(AddressRepository addressRepository,
                                CompanyRepository companyRepository,
-                               EstablishmentRepository establishmentRepository) {
+                               EstablishmentRepository establishmentRepository,
+                               MaterialRepository materialRepository,
+                               ContainerRepository containerRepository){
         this.addressRepository = addressRepository;
         this.companyRepository = companyRepository;
         this.establishmentRepository = establishmentRepository;
+        this.materialRepository = materialRepository;
+        this.containerRepository = containerRepository;
     }
 
     public Address getAddress(Address address) {
@@ -61,5 +65,18 @@ public class EntityService {
             }
         }
         return establishments;
+    }
+
+    public Material getMaterial (Material material){
+        Material existingMaterial = materialRepository.findByTypeIgnoreCase(material.getType());
+    if(existingMaterial != null){
+        return existingMaterial;
+    }
+        return materialRepository.save(material);
+    }
+    public void verifyContainerDoesNotExist(String materialId, String volume, String value) {
+        if (containerRepository.existsByMaterialMaterialIdAndVolumeAndValue(materialId, volume, value)) {
+            throw new DataIntegrityViolationException("Container Already Exist");
+        }
     }
 }
