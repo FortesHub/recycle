@@ -20,9 +20,9 @@ import java.util.Optional;
 public class EstablishmentController {
 
     private EstablishmentService establishmentService;
-    private String notFound = "Establishment Not Found!";
+    private String notFound = "establishment Not Found!";
     private String alreadyExist = "Establishment Already Exist";
-    private String deleted = "Establishment deleted successfully!";
+    private String deleted = "establishment deleted successfully!";
 
     @Autowired
     public void establishmentController(EstablishmentService establishmentService) {

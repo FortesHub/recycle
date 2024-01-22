@@ -9,3 +9,6 @@ public interface EstablishmentMapper {
     Establishment convertToEstablishment(EstablishmentDTO establishmentDTO);
     EstablishmentDTO establishmentToDTO(Establishment establishment);
 }
+
+
+
