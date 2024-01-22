@@ -32,8 +32,8 @@ public class MaterialService {
         return this.materialRepository.findAll();
     }
 
-    public Optional<Material> getMaterialById(String id) {
-        return this.materialRepository.findById(id);
+    public Material getMaterialByType(String type) {
+        return this.materialRepository.findByTypeIgnoreCase(type);
     }
 
     public MaterialDTO updateMaterial(String id, MaterialDTO materialDTO) {
@@ -43,12 +43,14 @@ public class MaterialService {
         return materialMapper.convertToDTO(updatedMaterial);
     }
 
+    @Transactional
     public boolean deleteMaterial(String type) {
-        List<Material> serchingMaterial = materialRepository.deleteByTypeIgnoreCase(type);
-        if (serchingMaterial.isEmpty()) {
-            return false;
+        Material deletedMaterial = getMaterialByType(type);
+        if (deletedMaterial != null) {
+            materialRepository.deleteByTypeIgnoreCase(deletedMaterial.getType());
+            return true;
         }
-        return true;
+        return false;
     }
 }
 

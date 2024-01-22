@@ -45,10 +45,10 @@ public class MaterialController {
         return new ResponseEntity<>(resultMaterial, HttpStatus.OK);
     }
 
-    @GetMapping("/{materialId}")
-    public ResponseEntity<?> getMaterialId(@PathVariable("materialId") String materialId) {
-        Optional<Material> material = materialService.getMaterialById(materialId);
-        if (material.isPresent()) {
+    @GetMapping("/{type}")
+    public ResponseEntity<?> getMaterialType(@PathVariable("type") String type) {
+        Material material = materialService.getMaterialByType(type);
+        if (material != null) {
             return new ResponseEntity<>(material, HttpStatus.OK);
         }
         throw new EntityNotFoundException(materialNotFound);
@@ -66,7 +66,7 @@ public class MaterialController {
     }
 
     @DeleteMapping("/{type}")
-    public ResponseEntity<?> deleteMaterial(@PathVariable("type") String type) {
+    public ResponseEntity<?> deleteMaterial(@PathVariable String type) {
         boolean material = materialService.deleteMaterial(type);
         if (material) {
             return new ResponseEntity<>(deleted, HttpStatus.OK);

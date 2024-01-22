@@ -11,8 +11,7 @@ import lombok.*;
 @EqualsAndHashCode(of = "materialId")
 public class Material {
     @Id
-    @GeneratedValue(strategy= GenerationType.UUID)
+    @GeneratedValue(strategy = GenerationType.UUID)
     private String materialId;
-    @Column(unique = true)
     private String type;
 }
