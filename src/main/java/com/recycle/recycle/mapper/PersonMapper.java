@@ -5,8 +5,7 @@ import com.recycle.recycle.dto.PersonDTO;
 import org.mapstruct.Mapper;
 
 @Mapper(componentModel = "spring")
-public interface PersonMapper {
+public interface PersonMapper  {
     PersonDTO convertToDTO(Person person);
-
     Person convertToPerson(PersonDTO personDTO);
 }

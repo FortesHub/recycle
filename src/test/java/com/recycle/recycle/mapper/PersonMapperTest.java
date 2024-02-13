@@ -7,6 +7,7 @@ import com.recycle.recycle.domain.Person;
 import com.recycle.recycle.dto.AddressCompositeDTO;
 import com.recycle.recycle.dto.AddressDTO;
 import com.recycle.recycle.dto.PersonDTO;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mapstruct.factory.Mappers;
 
@@ -18,35 +19,24 @@ import static org.junit.jupiter.api.Assertions.*;
 
 class PersonMapperTest {
     private PersonMapper personMapper = Mappers.getMapper(PersonMapper.class);
+    private Person person;
+    private PersonDTO personDTO;
 
+    @BeforeEach
+    public void setUp() {
+        person = new Person("personId123", "John Doe", "123456789",
+                "john.doe@example.com");
+        personDTO = new PersonDTO("John Doe", "123456789",
+                "john.doe@example.com");
+    }
     @Test
     void convertToDTO() {
-        Person person = new Person();
-        person.setName("IGA");
-        person.setEmail("iga@iga");
-
-        List<Company> companies = new ArrayList<>();
-        Company company1 = new Company();
-        company1.setName("company1");
-
-        List<Establishment> establishments = new ArrayList<>();
-        Establishment establishment1 = new Establishment();
-        establishment1.setName("establishment1");
-
-        person.setCompanies(companies);
-        person.setEstablishments(establishments);
-
         PersonDTO personDTO = personMapper.convertToDTO(person);
         assertEquals(person.getName(), personDTO.name());
     }
 
     @Test
     void convertToPerson() {
-        AddressCompositeDTO addressKey = new AddressCompositeDTO("Rue Saint Jean", "2", "J2w2T5");
-        AddressDTO addressDTO = new AddressDTO(addressKey, "Saint Jean", "Canada");
-        List<String> companyIds = Arrays.asList("123");
-        List<String> establishmentIds = Arrays.asList("321");
-        PersonDTO personDTO = new PersonDTO("iga", "438-111-1111", "iga@iga.com", addressDTO, companyIds, establishmentIds);
         Person person = personMapper.convertToPerson(personDTO);
         assertEquals(personDTO.name(), person.getName());
     }

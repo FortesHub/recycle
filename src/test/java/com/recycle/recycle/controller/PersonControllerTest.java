@@ -6,7 +6,8 @@ import com.recycle.recycle.dto.AddressDTO;
 import com.recycle.recycle.dto.ExceptionDTO;
 import com.recycle.recycle.dto.PersonDTO;
 import com.recycle.recycle.infra.GlobalControllerAdvice;
-import com.recycle.recycle.mapper.PersonMapper;
+//import com.recycle.recycle.mapper.PersonMapper;
+//import com.recycle.recycle.service.PersonService;
 import com.recycle.recycle.service.PersonService;
 import jakarta.persistence.EntityNotFoundException;
 import org.junit.jupiter.api.BeforeEach;
@@ -35,36 +36,18 @@ class PersonControllerTest {
     private PersonController personController;
     @Mock
     private PersonService personService;
-
     private PersonDTO personDTO;
     private List<Person> personList;
-    private List<Company> companies;
-    private List<Address> addressList;
-    private List<Establishment> establishments;
-    private String personNotFound = "Person Not Found!";
-    private String personAlreadyExist = "Person Already Exist";
-    private String pesonDeleted = "Person deleted successfully!";
+    private String notFound = "Person Not Found!";
+    private String alreadyExist = "Person Already Exist";
+    private String deleted = "Person deleted successfully!";
 
     @BeforeEach
     public void setUp() {
-        addressList = Arrays.asList(
-                new Address(new AddressComposite("rue des johns", "3", "j4k4j4"),
-                        "Saint Jean Sur Richelieu", "Canada"),
-                new Address(new AddressComposite("rue des Brin", "4", "j4k4j4"),
-                        "Saint Jean Sur Richelieu", "Canada"));
-        personDTO = new PersonDTO("John Doe", "123456789", "john.doe@example.com",
-                new AddressDTO(new AddressCompositeDTO("rue des johns", "3", "j4k4j4"),
-                        "Saint Jean Sur Richelieu", "Canada"), List.of("companyId1", "companyId2"), List.of("establishmentId1"));
+        personDTO = new PersonDTO("John Doe", "123456789", "john.doe@example.com");
         personList = Arrays.asList(
                 new Person("personId123", "John Doe", "123456789",
-                        "john.doe@example.com", addressList.get(0), List.of(), List.of()));
-        companies = Arrays.asList(
-                new Company("companyId1", "Company1", "123456789",
-                        "company@example.com", addressList.get(0), List.of()));
-
-        establishments = Arrays.asList(
-                new Establishment("establishmentId1", "Establishment1", "123456789",
-                        "establishment@example.com", addressList.get(0), List.of()));
+                        "john.doe@example.com"));
 
     }
 
@@ -81,11 +64,11 @@ class PersonControllerTest {
     @DisplayName("Test to registerPerson and return Person Already Exist")
     @Test
     void whenRegisterPersonRetunsAlreadyExist() {
-        when(personService.registerPerson(personDTO)).thenThrow(new DataIntegrityViolationException(personAlreadyExist));
+        when(personService.registerPerson(personDTO)).thenThrow(new DataIntegrityViolationException(alreadyExist));
         ResponseEntity<?> response = personController.registerPerson(personDTO);
         ExceptionDTO exceptionDTO = (ExceptionDTO) response.getBody();
         assertEquals(HttpStatus.CONFLICT, response.getStatusCode());
-        assertEquals(personAlreadyExist, exceptionDTO.message());
+        assertEquals(alreadyExist, exceptionDTO.message());
         verify(personService, times(1)).registerPerson(personDTO);
     }
 
@@ -102,13 +85,12 @@ class PersonControllerTest {
     @DisplayName("Test for Get person ID and return Optional Person")
     @Test
     void whenGetPersonByIdReturnOk() {
-        when(personService.getPersonById(any())).thenReturn(Optional.ofNullable(personList.get(0)));
+        when(personService.getPersonById(any())).thenReturn(Optional.of(personList.get(0)));
         ResponseEntity<?> response = personController.getPersonById(personList.get(0).getPersonId());
-        assertEquals(HttpStatus.OK, response.getStatusCode());
-        Optional<Person> personOptional = (Optional<Person>) response.getBody();
-        assertTrue(personOptional.isPresent());
-        assertEquals(personList.get(0), personOptional.get());
         verify(personService, times(1)).getPersonById(personList.get(0).getPersonId());
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        assertEquals(personList.get(0), response.getBody());
+
     }
 
     @DisplayName("Test for Get person ID and return Person not found")
@@ -117,34 +99,30 @@ class PersonControllerTest {
         String personId = "999";
         when(personService.getPersonById(personId)).thenReturn(Optional.empty());
         EntityNotFoundException exception = assertThrows(EntityNotFoundException.class, () -> personController.getPersonById(personId));
-        assertEquals(personNotFound, exception.getMessage());
+        assertEquals(notFound, exception.getMessage());
         verify(personService, times(1)).getPersonById(personId);
     }
 
     @DisplayName("Test for updatePerson and return Ok ")
     @Test
     void whenUpdatePersonReturnOk() {
-        String personId = "321";
-        PersonDTO updatedPersonDTO = new PersonDTO("updatedJohn", "438-111-1111", "updatedjohn@gmail.com",new AddressDTO(new AddressCompositeDTO("rue des Pines", "3", "j4k4j4"),
-                "Saint Jean Sur Richelieu", "Canada"), List.of("companyId1"), List.of("establishmentId1"));
-        when(personService.updatePerson(personId, personDTO)).thenReturn(updatedPersonDTO);
-        ResponseEntity<?> response = personController.updatePerson(personId, personDTO);
+        PersonDTO updatedPersonDTO = new PersonDTO("John Doee", "123456789", "john.doee@example.com");
+        when(personService.updatePerson(personList.get(0).getPersonId(), personDTO)).thenReturn(updatedPersonDTO);
+        ResponseEntity<?> response = personController.updatePerson(personList.get(0).getPersonId(), personDTO);
         assertEquals(HttpStatus.OK, response.getStatusCode());
-        verify(personService, times(1)).updatePerson(personId, personDTO);
+        verify(personService, times(1)).updatePerson(personList.get(0).getPersonId(), personDTO);
     }
 
     @DisplayName("Test to UpdatePerson and return Person Id Not Found")
     @Test
     void whenUpdatePersonThrowException() {
-        String personId = "321";
-        PersonDTO updatedPersonDTO = new PersonDTO("updatedJohn", "438-111-1111", "updatedjohn@gmail.com",new AddressDTO(new AddressCompositeDTO("rue des Pines", "3", "j4k4j4"),
-                "Saint Jean Sur Richelieu", "Canada"), List.of("companyId1"), List.of("establishmentId1"));
-        when(personService.updatePerson(personId, personDTO)).thenThrow(new DataIntegrityViolationException(personNotFound));
-        ResponseEntity<?> response = personController.updatePerson(personId, personDTO);
+        PersonDTO updatedPersonDTO = new PersonDTO("John Doee", "123456789", "john.doee@example.com");
+        when(personService.updatePerson(personList.get(0).getPersonId(), personDTO)).thenThrow(new DataIntegrityViolationException(notFound));
+        ResponseEntity<?> response = personController.updatePerson(personList.get(0).getPersonId(), personDTO);
         ExceptionDTO exception = (ExceptionDTO) response.getBody();
-        assertEquals(((ExceptionDTO) response.getBody()).message(), personNotFound);
+        assertEquals(((ExceptionDTO) response.getBody()).message(), notFound);
         assertEquals(((ExceptionDTO) response.getBody()).statusCode(), exception.statusCode());
-        verify(personService, times(1)).updatePerson(personId, personDTO);
+        verify(personService, times(1)).updatePerson(personList.get(0).getPersonId(), personDTO);
     }
 
     @DisplayName("Test for deletePerson and return message = Person deleted successfully! ")
@@ -152,7 +130,7 @@ class PersonControllerTest {
     void whenDeletePersonByIdReturnOK() {
         when(personService.deletePerson(any(String.class))).thenReturn(true);
         ResponseEntity<?> response = personController.deletePerson(personList.get(0).getPersonId());
-        assertEquals(pesonDeleted, response.getBody());
+        assertEquals(deleted, response.getBody());
         assertEquals(HttpStatus.OK, response.getStatusCode());
         verify(personService, times(1)).deletePerson(personList.get(0).getPersonId());
     }
@@ -163,7 +141,7 @@ class PersonControllerTest {
         String personId = "999";
         when(personService.deletePerson(any(String.class))).thenReturn(false);
         EntityNotFoundException exception = assertThrows(EntityNotFoundException.class, () -> personController.deletePerson(personId));
-        assertEquals(personNotFound, exception.getMessage());
+        assertEquals(notFound, exception.getMessage());
         verify(personService, times(1)).deletePerson(personId);
     }
 }

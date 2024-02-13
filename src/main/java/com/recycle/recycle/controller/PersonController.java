@@ -3,7 +3,6 @@ package com.recycle.recycle.controller;
 import com.recycle.recycle.domain.Person;
 import com.recycle.recycle.dto.ExceptionDTO;
 import com.recycle.recycle.dto.PersonDTO;
-import com.recycle.recycle.service.CompanyService;
 import com.recycle.recycle.service.PersonService;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,7 +13,6 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 import java.util.List;
-import java.util.Optional;
 
 @RestController
 @RequestMapping("/person")
@@ -23,8 +21,9 @@ public class PersonController {
     private String notFound = "Person Not Found!";
     private String alreadyExist = "Person Already Exist";
     private String deleted = "Person deleted successfully!";
+
     @Autowired
-    public void personController(PersonService personService){
+    public void personController(PersonService personService) {
         this.personService = personService;
     }
 
@@ -47,11 +46,10 @@ public class PersonController {
 
     @GetMapping("/{personId}")
     public ResponseEntity<?> getPersonById(@PathVariable("personId") String personId) {
-        Optional<Person> person = personService.getPersonById(personId);
-        if (person.isPresent()) {
-            return new ResponseEntity<>(person, HttpStatus.OK);
-        }
-        throw new EntityNotFoundException(notFound);
+        Person person = personService.getPersonById(personId)
+                .orElseThrow(() -> new EntityNotFoundException(notFound));
+        return new ResponseEntity<>(person, HttpStatus.OK);
+
     }
 
     @PutMapping("/{personId}")

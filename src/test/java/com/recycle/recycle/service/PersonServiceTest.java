@@ -4,6 +4,7 @@ import com.recycle.recycle.domain.*;
 import com.recycle.recycle.dto.AddressCompositeDTO;
 import com.recycle.recycle.dto.AddressDTO;
 import com.recycle.recycle.dto.PersonDTO;
+//import com.recycle.recycle.mapper.PersonMapper;
 import com.recycle.recycle.mapper.PersonMapper;
 import com.recycle.recycle.repository.AddressRepository;
 import com.recycle.recycle.repository.CompanyRepository;
@@ -32,54 +33,29 @@ class PersonServiceTest {
     private PersonService personService;
     @Mock
     private PersonRepository personRepository;
-    @Mock
-    private AddressRepository addressRepository;
-    @Mock
-    private CompanyRepository companyRepository;
     @Spy
     private PersonMapper personMapper = Mappers.getMapper(PersonMapper.class);
-
     private PersonDTO personDTO;
     private List<Person> personList;
-    private List<Address> addressList;
-    private List<Company> companies;
-    private List<Establishment> establishments;
 
     @BeforeEach
     public void setUp() {
-        addressList = Arrays.asList(
-                new Address(new AddressComposite("rue des johns", "3", "j4k4j4"),
-                        "Saint Jean Sur Richelieu", "Canada"),
-                new Address(new AddressComposite("rue des Brin", "4", "j4k4j4"),
-                        "Saint Jean Sur Richelieu", "Canada"));
-        personDTO = new PersonDTO("John Doe", "123456789", "john.doe@example.com",
-                new AddressDTO(new AddressCompositeDTO("rue des johns", "3", "j4k4j4"),
-                        "Saint Jean Sur Richelieu", "Canada"), List.of("companyId1", "companyId2"),  List.of("establishmentId1"));
+        personDTO = new PersonDTO("John Doe", "123456789", "john.doe@example.com");
         personList = Arrays.asList(
                 new Person("personId123", "John Doe", "123456789",
-                        "john.doe@example.com", addressList.get(0), List.of(), List.of()));
-        companies = Arrays.asList(
-                new Company("companyId1", "Company1", "123456789",
-                        "company@example.com", addressList.get(0), List.of()));
-        establishments = Arrays.asList(
-                new Establishment("establishmentId1", "Establishment1", "123456789",
-                        "establishment@example.com", addressList.get(0), List.of()));
+                        "john.doe@example.com"));
 
    }
 
-//    @DisplayName("Test for register person and return Person")
-//    @Test
-//    void givenPersonObject_whenRegisterPerson() {
-//        when(addressRepository.findByAddressComposite(any())).thenReturn(addressList.get(0));
-//        when(personRepository.save(any())).thenReturn(personList.get(0));
-//        when(companyRepository.findById(anyString())).thenReturn(Optional.of(companies.get(0)));
-//        PersonDTO result = personService.registerPerson(personDTO);
-//        verify(personRepository, times(1)).save(any());
-//        verify(addressRepository, times(1)).findByAddressComposite(addressList.get(0).getAddressComposite());
-//        verify(companyRepository, times(1)).findById(companies.get(0).getCompanyId());
-//        assertNotNull(result);
-//        assertEquals(personDTO.name(), result.name());
-//    }
+    @DisplayName("Test for register person and return Person")
+    @Test
+    void givenPersonObject_whenRegisterPerson() {
+        when(personRepository.save(any())).thenReturn(personList.get(0));
+        PersonDTO result = personService.registerPerson(personDTO);
+        verify(personRepository, times(1)).save(any());
+        assertNotNull(result);
+        assertEquals(personDTO.name(), result.name());
+    }
 
 
     @DisplayName("Test for get all person and return list of person")
@@ -101,35 +77,20 @@ class PersonServiceTest {
         assertEquals(Optional.of(personList.get(0)), resultPerson);
     }
 
-//    @DisplayName("Test for update Person with existing Id")
-//    @Test
-//    void givenIdPersonAndUpdatePerson() {
-//        String id = "321";
-//        Company company = new Company("companyId1", "Company1", "123456789",
-//                "company@example.com", addressList.get(0), List.of());
-//        personDTO = new PersonDTO("John", "123456789", "john.doe@example.com",
-//                new AddressDTO(new AddressCompositeDTO("rue des Pines", "3", "j4k4j4"),
-//                        "Saint Jean Sur Richelieu", "Canada"), List.of("companyId1"),  List.of("establishmentId1"));
-//        Person personDTOtoPerson =  new Person("321", "updatedJohn", "438-111-1111", "updatedjohn@gmail.com", new Address(new AddressComposite("rue des johns",
-//                "3", "j4k4j4"), "Saint Jean Sur Richelieu", "Canada"), List.of(new Company("companyId1", "Company1", "123456789",
-//                "company@example.com", addressList.get(0), List.of()), List.of(  new Establishment("establishmentId1", "Establishment1", "123456789",
-//                "establishment@example.com", addressList.get(0), List.of())));
-//
-//        when(personRepository.save(any(Person.class))).thenReturn(personDTOtoPerson);
-//        when(companyRepository.findById(anyString())).thenReturn(Optional.of(company));
-//        PersonDTO resultDTO = personService.updatePerson(personDTOtoPerson.getPersonId(), personDTO);
-//        verify(personRepository, times(1)).save(any(Person.class));
-//        assertEquals("updatedJohn", resultDTO.name());
-//        assertEquals("438-111-1111", resultDTO.telephone());
-//        assertEquals("updatedjohn@gmail.com", resultDTO.email());
-//        assertEquals("rue des johns", resultDTO.address().addressComposite().street());
-//        assertEquals("3", resultDTO.address().addressComposite().complement());
-//        assertEquals("j4k4j4", resultDTO.address().addressComposite().postalCode());
-//        assertEquals("Saint Jean Sur Richelieu", resultDTO.address().city());
-//        assertEquals("Canada", resultDTO.address().pays());
-//        assertEquals("companyId1", resultDTO.companyIds().get(0));
-//
-//    }
+    @DisplayName("Test for update Person with existing Id")
+    @Test
+    void givenIdPersonAndUpdatePerson() {
+        String id = "321";
+        personDTO = new PersonDTO("John", "123456789", "john.doe@example.com");
+        Person personDTOtoPerson =  new Person("321", "updatedJohn", "438-111-1111", "updatedjohn@gmail.com");
+
+        when(personRepository.save(any(Person.class))).thenReturn(personDTOtoPerson);
+        PersonDTO resultDTO = personService.updatePerson(personDTOtoPerson.getPersonId(), personDTO);
+        verify(personRepository, times(1)).save(any(Person.class));
+        assertEquals("updatedJohn", resultDTO.name());
+        assertEquals("438-111-1111", resultDTO.telephone());
+        assertEquals("updatedjohn@gmail.com", resultDTO.email());
+    }
 
     @DisplayName("Test for find person By Id and delete Person")
     @Test
