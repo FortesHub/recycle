@@ -13,7 +13,6 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 import java.util.List;
-import java.util.Optional;
 
 @RequestMapping("/company")
 @RestController()
@@ -46,11 +45,9 @@ public class CompanyController {
 
     @GetMapping("/{companyId}")
     public ResponseEntity<?> getCompanyById(@PathVariable("companyId") String companyId) {
-        Optional<Company> existingCompany = companyService.getCompanyById(companyId);
-        if (existingCompany.isPresent()) {
-            return new ResponseEntity<>(existingCompany, HttpStatus.OK);
-        }
-        throw new EntityNotFoundException(notFound);
+        Company existingCompany = companyService.getCompanyById(companyId)
+                .orElseThrow(() -> new EntityNotFoundException(notFound));
+        return new ResponseEntity<>(existingCompany, HttpStatus.OK);
     }
 
     @PutMapping("/{companyId}")

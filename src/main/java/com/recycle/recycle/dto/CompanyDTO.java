@@ -14,4 +14,9 @@ public record CompanyDTO(
         @NotBlank(message = "Empty email") String email,
         @Valid @NotNull(message = "The address is required.")
         AddressDTO address,
-        List<Person> employees){}
+        List<String> employees,
+        List<String> establishments,
+        List<String> machines
+
+){}
+

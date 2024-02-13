@@ -29,6 +29,22 @@ public class Company{
     @JoinColumn(name = "postalCode", referencedColumnName = "postalCode")
     @Valid
     private Address address;
-    @ManyToMany(mappedBy = "companies")
+    @ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE}, fetch = FetchType.LAZY)
+    @JoinTable(
+            joinColumns = @JoinColumn(name = "person_id"),
+            inverseJoinColumns = @JoinColumn(name = "company_id")
+    )
     private List<Person> employees;
+    @ManyToMany
+    @JoinTable(
+            joinColumns = @JoinColumn(name = "machine_id"),
+            inverseJoinColumns = @JoinColumn(name = "company_id")
+    )
+    private List<Machine> machines;
+    @OneToMany
+    @JoinTable(
+            joinColumns = @JoinColumn(name = "establishment_id"),
+            inverseJoinColumns = @JoinColumn(name = "company_id")
+    )
+    private List<Establishment> establishments;
 }

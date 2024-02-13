@@ -1,14 +1,16 @@
 package com.recycle.recycle.service;
 
-import com.recycle.recycle.domain.Address;
-import com.recycle.recycle.domain.AddressComposite;
-import com.recycle.recycle.domain.Company;
-import com.recycle.recycle.domain.Person;
+import com.recycle.recycle.domain.*;
 import com.recycle.recycle.dto.AddressCompositeDTO;
 import com.recycle.recycle.dto.AddressDTO;
 import com.recycle.recycle.dto.CompanyDTO;
+//import com.recycle.recycle.mapper.CompanyMapper;
 import com.recycle.recycle.mapper.CompanyMapper;
 import com.recycle.recycle.repository.CompanyRepository;
+import com.recycle.recycle.service.utils.AddressUtils;
+import com.recycle.recycle.service.utils.EstablishmentUtils;
+import com.recycle.recycle.service.utils.MachineUtils;
+import com.recycle.recycle.service.utils.PersonUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -34,42 +36,64 @@ class CompanyServiceTest {
     @Mock
     CompanyRepository companyRepository;
     @Mock
-    EntityService entityService;
+    AddressUtils addressUtils;
+    @Mock
+    PersonUtils personUtils;
+    @Mock
+    EstablishmentUtils establishmentUtils;
+    @Mock
+    MachineUtils machineUtils;
     @Spy
     CompanyMapper companyMapper = Mappers.getMapper(CompanyMapper.class);
-    CompanyDTO companyDTO;
-    List<Person> personList;
-    List<Address> addressList;
-    List<Company> companyList;
+    private CompanyDTO companyDTO;
+    private List<Company> companyList;
+    private List<Person> employees;
+    private List<String> employeesString;
+    private Address address;
+    private AddressComposite addressComposite;
+    private AddressCompositeDTO addressCompositeDTO;
+    private AddressDTO addressDTO;
+    private List<Machine> machines;
+    private List<String> machinesString;
+    private List<Material> containers;
+    private Status status;
+    private List<Establishment> establishments;
+    private List<String> establishmentsString;
+
 
     @BeforeEach
     void setUp() {
-        addressList = Arrays.asList(
-                new Address(new AddressComposite("rue des johns", "3", "j4k4j4"),
-                        "Saint Jean Sur Richelieu", "Canada"));
-        personList = Arrays.asList(
-                new Person("personId123", "John Doe", "123456789",
-                        "john.doe@example.com", addressList.get(0), List.of(), List.of()));
+        addressComposite = new AddressComposite("rue des johns", "3", "j4k4j4");
+        address = new Address(addressComposite, "Saint Jean Sur Richelieu", "Canada");
+        addressCompositeDTO = new AddressCompositeDTO("rue des johns", "3", "j4k4j4");
+        addressDTO = new AddressDTO(addressCompositeDTO, "Saint Jean Sur Richelieu", "Canada");
+        employees = Arrays.asList(new Person("personId123", "John Doe", "123456789",
+                "john.doe@example.com"));
+        employeesString = Arrays.asList("personId123");
+        status = Status.WORK;
+        containers = Arrays.asList(new Material("materialId123", "paper"));
+        machines = Arrays.asList(new Machine("machineId123", status, false, containers));
+        machinesString = Arrays.asList("machineId123");
+        establishments = Arrays.asList(new Establishment("establishmentId123", "Walamart", "4444", "walmart@gmail.com", address, employees, machines));
+        establishmentsString = Arrays.asList("establishmentId123");
         companyList = Arrays.asList(
                 new Company("companyId1", "Company1", "123456789",
-                        "company@example.com", addressList.get(0), List.of()));
+                        "company@example.com", address, employees, machines, establishments));
         companyDTO = new CompanyDTO(
-                "Company1",
-                "123456789",
-                "company@example.com",
-                new AddressDTO(new AddressCompositeDTO("rue des johns", "3", "j4k4j4"),
-                        "Saint Jean Sur Richelieu",
-                        "Canada"), List.of());
+                "Company1", "123456789",
+                "company@example.com", addressDTO, employeesString, establishmentsString, machinesString);
     }
 
     @DisplayName("Test for register Company and return Company")
     @Test
     void givenCompanyWhenGetCompany() {
-        when(entityService.getAddress(any())).thenReturn(addressList.get(0));
+        when(addressUtils.getAddress(any())).thenReturn(address);
+        when(personUtils.getEmployees(any())).thenReturn(employees);
+        when(establishmentUtils.getEstablishments(any())).thenReturn(establishments);
+        when(machineUtils.getMachines(any())).thenReturn(machines);
         when(companyRepository.save(any(Company.class))).thenReturn(companyList.get(0));
         CompanyDTO registeredCompany = companyService.registerCompany(companyDTO);
         verify(companyRepository, times(1)).save(any(Company.class));
-        verify(entityService, times(1)).getAddress(addressList.get(0));
         assertEquals(companyDTO, registeredCompany);
     }
 
@@ -99,11 +123,9 @@ class CompanyServiceTest {
                 "Company2",
                 "123456789",
                 "company@example.com",
-                new AddressDTO(new AddressCompositeDTO("rue des johns", "3", "j4k4j4"),
-                        "Saint Jean Sur Richelieu",
-                        "Canada"), List.of());
+                addressDTO, employeesString, establishmentsString, machinesString);
         Company companydtoToCompany = new Company("companyId1", "Company2", "123456789",
-                "company@example.com", addressList.get(0), List.of());
+                "company@example.com", address, employees, machines, establishments);
         when(companyRepository.save(any(Company.class))).thenReturn(companydtoToCompany);
         CompanyDTO resultCompany = companyService.updateCompany(companyId, companyDTO);
         verify(companyRepository, times(1)).save(companyList.get(0));
