@@ -1,6 +1,8 @@
 package com.recycle.recycle.controller;
 
+import com.recycle.recycle.domain.Address;
 import com.recycle.recycle.domain.Establishment;
+import com.recycle.recycle.domain.Material;
 import com.recycle.recycle.dto.EstablishmentDTO;
 import com.recycle.recycle.dto.ExceptionDTO;
 import com.recycle.recycle.service.EstablishmentService;
@@ -46,15 +48,20 @@ public class EstablishmentController {
         return new ResponseEntity<>(establishments, HttpStatus.OK);
     }
 
+    @GetMapping("/filter")
+    public ResponseEntity<?> getEstablishmentByFilters(@RequestParam(name = "name", required = false) String name,
+                                                       @RequestParam(name = "postalCode", required = false) String postalCode,
+                                                       @RequestParam(name = "type", required = false) String type){
+        List<Establishment> establishments = establishmentService.getEstablishmentByFilters(name, postalCode, type);
+        return new ResponseEntity<>(establishments, HttpStatus.OK);
+    }
+
 
     @GetMapping("/{establishmentId}")
     public ResponseEntity<?> getEstablishmentById(@PathVariable("establishmentId") String establishmentId) {
-      Optional<Establishment> existingEstablishment = establishmentService.getEstablishmentByID(establishmentId);
-        if (existingEstablishment.isPresent()) {
+      Establishment existingEstablishment = establishmentService.getEstablishmentByID(establishmentId)
+              .orElseThrow(() -> new EntityNotFoundException(notFound));
             return new ResponseEntity<>(existingEstablishment, HttpStatus.OK);
-        } else {
-            throw new EntityNotFoundException(notFound);
-        }
     }
 
     @PutMapping("/{establishmentId}")

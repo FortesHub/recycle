@@ -1,6 +1,5 @@
 package com.recycle.recycle.domain;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -28,6 +27,16 @@ public class Establishment {
     @JoinColumn(name = "postalCode", referencedColumnName = "postalCode")
     @Valid
     private Address address;
-    @ManyToMany(mappedBy = "establishments")
+    @ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE}, fetch = FetchType.LAZY)
+    @JoinTable(
+            joinColumns = @JoinColumn(name = "person_id"),
+            inverseJoinColumns = @JoinColumn(name = "establishment_id")
+    )
     private List<Person> employees;
+    @ManyToMany
+    @JoinTable(
+            joinColumns = @JoinColumn(name = "machine_id"),
+            inverseJoinColumns = @JoinColumn(name = "establishment_id")
+    )
+    private List<Machine> machines;
 }

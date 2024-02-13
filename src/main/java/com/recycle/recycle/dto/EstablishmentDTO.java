@@ -1,6 +1,5 @@
 package com.recycle.recycle.dto;
 
-import com.recycle.recycle.domain.Address;
 import com.recycle.recycle.domain.Person;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
@@ -14,4 +13,5 @@ public record EstablishmentDTO(
         @NotBlank(message = "Empty email") String email,
         @Valid @NotNull(message = "Address is required")
         AddressDTO address,
-        List<Person> employees){}
+        List<String> employees,
+        List<String> machines){}

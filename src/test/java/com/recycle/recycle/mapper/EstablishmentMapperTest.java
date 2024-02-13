@@ -1,9 +1,6 @@
 package com.recycle.recycle.mapper;
 
-import com.recycle.recycle.domain.Address;
-import com.recycle.recycle.domain.AddressComposite;
-import com.recycle.recycle.domain.Establishment;
-import com.recycle.recycle.domain.Person;
+import com.recycle.recycle.domain.*;
 import com.recycle.recycle.dto.AddressCompositeDTO;
 import com.recycle.recycle.dto.AddressDTO;
 import com.recycle.recycle.dto.CompanyDTO;
@@ -28,6 +25,11 @@ class EstablishmentMapperTest {
     private Address address;
     private AddressDTO addressDTO;
     private List<Person> employees;
+    private List<String> employeesString;
+    private List<Machine> machines;
+    private List<String> machinesString;
+    private List<Material> containers;
+    private Status status;
 
     @BeforeEach
     public void setUp() {
@@ -35,12 +37,15 @@ class EstablishmentMapperTest {
         address = new Address(addressComposite, "Saint Jean Sur Richelieu", "Canada");
         addressCompositeDTO = new AddressCompositeDTO("rue des johns", "3", "j4k4j4");
         addressDTO = new AddressDTO(addressCompositeDTO, "Saint Jean Sur Richelieu", "Canada");
-        employees = Arrays.asList(
-                new Person("personId123", "John Doe", "123456789",
-                        "john.doe@example.com", address, List.of(), List.of())
-        );
-        establishmentDTO = new EstablishmentDTO("establishmentDTO", "222", "uniprix@uniprix", addressDTO, employees);
-        establishment = new Establishment("123", "establishment", "222", "uniprix@uniprix", address, employees);
+        employees = Arrays.asList(new Person("personId123", "John Doe", "123456789",
+                "john.doe@example.com"));
+        employeesString = Arrays.asList("personId123");
+        status = Status.WORK;
+        containers = Arrays.asList(new Material("materialId123", "paper"));
+        machines = Arrays.asList(new Machine("machineId123", status, false, containers));
+        machinesString = Arrays.asList("machineId123");
+        establishmentDTO = new EstablishmentDTO("establishmentDTO", "222", "uniprix@uniprix", addressDTO, employeesString, machinesString);
+        establishment = new Establishment("123", "establishment", "222", "uniprix@uniprix", address, employees, machines);
     }
 
     @Test
